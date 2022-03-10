@@ -1,0 +1,10 @@
+php dependencies:
+	libxml-2.0
+	====>depencencies:
+		libtool
+		automake
+		autoconf
+
+	location ~ \.cgi$	{
+		include /files/cgi;
+	}

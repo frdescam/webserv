@@ -1,0 +1,2 @@
+
+##	SERVER					DATA_TYPE		VAL_NUM			VALID				

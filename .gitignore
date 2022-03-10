@@ -1,0 +1,28 @@
+# macos garbage
+.DS_Store
+
+# binary stuff
+*.o
+*.out
+webserv
+
+# tmp files
+out.html
+
+# changing 4xx.html
+files/error_pages/error_4xx.html
+
+# debug
+*.out.dSYM
+*.dylib
+*.gdb_history
+
+# utils and IDE stuff
+personalDir
+.vscode
+exam06
+*.swiftdoc
+*.swiftmodule
+.*.swp
+*.vim
+

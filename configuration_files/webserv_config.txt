@@ -1,0 +1,21 @@
+#
+##	SERVER					DATA_TYPE		VAL_NUM			VALID				
+#																			
+port						INT				UNIQ							
+host						INT				UNIQ							
+server_name					STRING			SEVERAL							
+error_page					INT				SEVERAL							
+time_out					INT				UNIQ							
+cgi_file_types				STRING			SEVERAL							
+location					STRING			UNIQ							
+#																			
+##	LOCATION				DATA_TYPE		VAL_NUM							
+#																			
+alias						STRING			UNIQ							
+allowed_method				STRING			SEVERAL							
+auth_basic					BOOL			UNIQ							
+auth_user_file				STRING			UNIQ							
+autoindex					BOOL			UNIQ							
+index						STRING			UNIQ							
+max_file_size				INT				UNIQ							
+root						STRING			UNIQ							
