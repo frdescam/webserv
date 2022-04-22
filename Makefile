@@ -7,7 +7,7 @@ SRC += client_handler.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
-CC = clang++
+CC = c++
 
 RM = rm -f
 
