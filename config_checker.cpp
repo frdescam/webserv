@@ -272,13 +272,13 @@ void config_checker::extract_to_string(std::ifstream& ifs, string& v) {
 			v = word;
 		else {
 			if (std::count(word.begin(), word.end(), ';') != 1 || word[word.size() -1] != ';')
-				throw (configException(_si, "bad formating(1) above : " + word));
+				throw (configException(_si, "bad formating(1) around : " + word));
 			word.resize(word.size() -1);
 			v = word;
 			return ; // On quite au cas ou la ';' est deja passee
 		}
 		if (ifs >> word && word != ";")
-			throw (configException(_si, "bad formating(2) above : " + word));
+			throw (configException(_si, "bad formating(2) around : " + word));
 	}
 	else // au cas ou il n'y a plus de mots
 		throw (configException(_si, "bad formating(3) EOF reached"));

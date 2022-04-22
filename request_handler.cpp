@@ -99,7 +99,7 @@ void request_handler::reader(client_info& client)
 	// cout << RED "APRES GETLINE : " << buf_1 << RESET << endl;
 	// this->display();
 
-/* 	std::cout << "=========================================================" << std::endl;
+	std::cout << "=========================================================" << std::endl;
 	for(std::map<std::string, std::vector<std::string> >::iterator it = _hrx.begin(); it != _hrx.end(); it++)
 	{
 		std::cout << it->first << "=";
@@ -107,7 +107,7 @@ void request_handler::reader(client_info& client)
 			std::cout << *i << " ";
 		std::cout << std::endl;
 	}
-	std::cout << "=========================================================" << std::endl; */
+	std::cout << "=========================================================" << std::endl;
 	
 }
 
@@ -168,7 +168,7 @@ void	request_handler::gen_startLine(std::map<string, string>::iterator status)
 	_htx["A"][2] += "\r\n";
 // MODIFIE LE PNG DS ERROR_PAGE.HTML SI NECESSAIRE
 	if (atoi(status->first.c_str()) >= 300) {
-		fstream error_file("files/error_pages/4xx.html");
+		fstream error_file("files/error_pages/error_4xx.html");
 		error_file.seekg(1252);
 		error_file.write(status->first.c_str(), 3);
 		error_file.close();
@@ -252,10 +252,9 @@ void	request_handler::gen_CLength()
 		ss << _body.size();
 	_htx["Content-Length"].push_back( ss.str());
 	_htx["Content-Length"].push_back( "\r\n"  );
-// PLUS DE REQUETE TROP LONGUE POUR LA REPONSE AU CLIENT (A DECOMMENTER -AV SON HOMOLOGUE DS gen_CLength()- SI CHANGEMENT D'AVIS)
-/* 	if (!_si[_s_id].location[_l_id].max_file_size.empty() // POUR LES REQUEST ENTITY TOO LARGE SUREMENT A VIRER D'ICI
+	if (!_si[_s_id].location[_l_id].max_file_size.empty() // POUR LES REQUEST ENTITY TOO LARGE SUREMENT A VIRER D'ICI
 		&& atoi(ss.str().c_str()) > atoi(_si[_s_id].location[_l_id].max_file_size.c_str()))
-		gen_startLine( _status.find("413") ); */
+		gen_startLine( _status.find("413") );
 }
 
 	/* FUNCTION SECONDAIRE : UTILITAIRES */
@@ -276,10 +275,8 @@ void request_handler::set_server_id(void)
 		}
 // SI LE HOST:PORT N'A PAS ETE TROUVE ON SELECT LE PREMIER SERVER CORRESPONDANT
 	for (int i = 0; i < _si.size(); ++i)
-		if (_si[i].port == port) {
-			_s_id = i;
-			break;
-		}
+		if (_si[i].port == port)
+			_s_id = i; // PROBLEM ?
 #ifdef _debug_
 			cout << "host : " << host << ", port : " << port << ", id : " << _s_id << endl;
 #endif
@@ -391,8 +388,7 @@ int	request_handler::resolve_path()
 					if (it2->location == it->retour.back()) {
 						cout << RED " it->retour[1] :" RESET +  it->retour[1] << endl;
 						string::const_iterator c_it = it->retour[0].begin();
-						while (c_it != it->retour[0].end() && std::isdigit(*c_it))
-							++c_it;
+						while (c_it != it->retour[0].end() && std::isdigit(*c_it)) ++c_it;
 						if ( !it->retour[0].empty() && c_it == it->retour[0].end())
 							gen_startLine( _status.find(it->retour[0]) );
 
@@ -408,8 +404,8 @@ int	request_handler::resolve_path()
 			// _path += it->location.back() == '/' ? it->location : it->location + "/";
 			_path += _hrx["A"][1].substr(it->location.size());
 			len = it->location.length();
-			// if (it->location.size() == _hrx["A"][1].size()) // Mnt ajout de l'index.html mis ds file_type si necessaire
-			// 	_path += _si[_s_id].location[_l_id].index;
+			if (it->location.size() == _hrx["A"][1].size())
+				_path += _si[_s_id].location[_l_id].index;
 		}
 #ifdef _debug_
 	cout << BLUE "path : " RESET << _path << endl;
@@ -422,6 +418,7 @@ int	request_handler::resolve_path()
 	cout << BLUE "resolved_path : " RESET << _path << endl;
 	cout << "location [" << _l_id << "] : " + _si[_s_id].location[_l_id].location << endl;
 #endif
+
 // VERIFIE SI LA MÉTHODE DS LA LOCATION CONCERNÉE EST AUTORISÉE
 	bool allowed = false;
 	for (int i = 0; i < _si[_s_id].location[_l_id].allowed_method.size(); ++i)
@@ -430,10 +427,10 @@ int	request_handler::resolve_path()
 	if (!allowed)
 		gen_startLine( _status.find("405") );
 	return allowed ? 0 : 1; /* PROBLEM  oN SAIT PAS TROP CE QU'ON FAIT LÀ... (double return) */
+
 }
 
-// Détecte si c'est un fichier normal ou s'il n'existe pas (maj de la statut-line si besoin)
-// Si c'est un dossier check l'autoindex ou la presence d'une directive index et affiche le contenu du dossier ou ajoute le fichier index respectivement
+// Détecte si c'est un dossier ou un fichier normal ou s'il n'existe pas (maj de la statut-line si besoin)
 // Si erreur lors de l'ouverture du fichier renvoie le _path sur les pages d'erreurs
 int request_handler::file_type()
 {
@@ -443,63 +440,61 @@ int request_handler::file_type()
 		perror("lstat");
 
 	switch (sb.st_mode & S_IFMT) {
-		// case S_IFBLK:  printf("block device\n");			break;
-		// case S_IFCHR:  printf("character device\n");		break;
+		// case S_IFBLK:  printf("block device\n");            break;
+		// case S_IFCHR:  printf("character device\n");        break;
 		case S_IFDIR:  printf("directory\n");
 			if (_si[_s_id].location[_l_id].autoindex == "on") {
 // PROBLEM
 				generate_folder_list();
 				return 1;
 			}
-			if (!_si[_s_id].location[_l_id].index.empty()) {
-				_path += _path.back() == '/' ? _si[_s_id].location[_l_id].index : '/' + _si[_s_id].location[_l_id].index;		
-				file_type();									
-			}
-			break;
-/* 		case S_IFIFO:  printf("FIFO/pipe\n");				break;
-		case S_IFLNK:  printf("symlink\n");					break; */
-		case S_IFREG:  printf("regular file\n");			break;
-/* 		case S_IFSOCK: printf("socket\n");					break; */
+			_path = "./files/if_folder.html";                  break;
+		// case S_IFIFO:  printf("FIFO/pipe\n");               break;
+		// case S_IFLNK:  printf("symlink\n");                 break;
+		case S_IFREG:  printf("regular file\n");               break;
+		// case S_IFSOCK: printf("socket\n");                  break;
 		default:
 			if (atoi(_htx["A"][1].c_str()) < 400)
 				gen_startLine( _status.find("404") );
-			printf(RED "unknown path : %s\n" RESET, _path.c_str());
+			printf(RED "unknown path...\n" RESET);
 			break;
 	}
-// AIGUILLE LE PATH SUR LA PAGE D'ERREUR CORRESPONDANTE
-	if (atoi(_htx["A"][1].c_str()) >= 400)
-		_path = _si[_s_id].error_page.empty() || _si[_s_id].error_page.find("files/error_pages") != string::npos ? "files/error_pages/4xx.html" : _si[_s_id].error_page + _htx["A"][1] + ".html";
+	if (atoi(_htx["A"][1].c_str()) >= 400) /* Faire en sorte de changer le png */
+		_path = (_si[_s_id].error_page.empty() ? "./files/error_pages/" : _si[_s_id].error_page) + "error_4xx.html";
 	printf("_path : %s\n", _path.c_str());
 	return 0;
 }
 
-// Créé la liste de fichier(s) à afficher ds _body
+// execute le script perl er pipe sont résultat ds _body
 void request_handler::generate_folder_list()
 {
-	DIR *dpdf;
-	set<string> st;
-	struct dirent *epdf;
-
-	dpdf = opendir(_path.c_str());
-	if (dpdf != NULL)
-	   	while ((epdf = readdir(dpdf))) {
-			st.insert(epdf->d_name);
-	    	std::cout << epdf->d_name << std::endl;
+	int fd[2], pid;
+	if (pipe(fd) == -1 || (pid = fork()) == -1)
+		throw runtime_error("pipe || fork failed");
+	if (pid == 0) {// Child
+		char const *argv[] = {"files/cgi/perlFolderLister.pl", _path.c_str(), NULL};
+		close(fd[0]);	/* Close unused read end */
+		dup2(fd[1], STDOUT_FILENO);
+		if (execv(*argv, (char *const *)argv) == -1)
+			_exit(EXIT_FAILURE);
+		close(fd[1]);
+	}
+	else {
+		close(fd[1]);          /* Close unused write end */
+		char buf[1000];
+		int n;
+		_body.clear();
+		while ((n = read(fd[0], buf, 999))) {
+			buf[n] = '\0';
+			_body.append(buf);
 		}
-	closedir(dpdf);
-
-	fstream autoindex_file("configuration_files/autoindex.html");
-	if (!autoindex_file.is_open())
-		throw (std::runtime_error("Couldn't open : configuration_files/autoindex.html"));
-// BUFFERISE LE TEMPLATE HTML POUR Y AJOUTER LE CONTENU DU DOSSIER
-	std::stringstream buffer;
-	buffer << autoindex_file.rdbuf();
-	_body = buffer.str();
-	autoindex_file.close();
-	// cout << "_hrx['A'][1]" << _hrx["A"][1] << " _path : "  << _path << endl;
-	for (set<string>::iterator i = st.begin(); i != st.end(); ++i)
-		_body.append("<div><a href=\"" + _hrx["A"][1] + '/' + *i + "\">" + *i + "</a></div>");
-	_body.append("</div></body></html>");
+		gen_CType("html");
+		// gen_CType("html");
+		cout <<  CYAN "folder_ response" RESET << _body  <<  CYAN "path_ response" RESET << _path << endl;
+		close(fd[0]);          /* Reader will see EOF */
+		wait(NULL);            /* Wait for child */
+		return ;
+	}
 }
 
 // Clear la string (response) et y ajoute tous les field, puis clear _hrx
@@ -516,8 +511,8 @@ void request_handler::add_all_field()
 // Ajout du fichier ou du body À LA SUITE des header dans response
 void request_handler::add_body()
 {
-/* 	if (_htx["A"][1] == "413") // PLUS DE REQUETE TROP LONGUE POUR LA REPONSE AU CLIENT
-		return ; */
+	if (_htx["A"][1] == "413")
+		return ;
 	if (!_body.empty()) {
 		_response += _body;
 		_body.clear();

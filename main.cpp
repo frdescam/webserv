@@ -10,10 +10,8 @@ int main(int ac, char const *av[])
 {
 	if (ac != 2)
 		// exit(EXIT_FAILURE);
-		av[1] = "./configuration_files/valid/default.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
-	else
-		av[1] = "./configuration_files/valid/simple.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
-	// av[1] = "./configuration_files/valid/test.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
+//	 av[1] = "./configuration_files/valid/default.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
+	av[1] = "./configuration_files/valid/simple.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
 	try
 	{
 		server webserv(av[1]);
