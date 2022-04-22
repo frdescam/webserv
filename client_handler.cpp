@@ -77,7 +77,7 @@ void client_handler::add(struct_epoll& _epoll, int time_out, int i)
 	socklen_t len = sizeof(clientaddr);
 	if ((client_fd = accept4(_epoll._events[i].data.fd, (struct sockaddr *)&clientaddr, &len, SOCK_NONBLOCK)) < 0)
 		throw std::runtime_error("ERROR IN SOCKET ATTRIBUTION");
-	clientaddr.sin_addr;
+	// clientaddr.sin_addr;
 	//SET NON BLOCK
 	int opt = 1;
 	setsockopt(client_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int));
