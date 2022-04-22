@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 IP=127.0.0.1
-PORT=8080
+PORT=8081
 
 
 curl -X GET http://$IP:$PORT   # Devrait redoner l'index par default (server par default)

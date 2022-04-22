@@ -18,12 +18,10 @@ NAME = webserv
 
 CGI_OUT = http://127.0.0.1::8080/scripts/layout.html
 
-ifeq ($(df), 0)
 CPP_FLAGS += -Wall
 CPP_FLAGS += -Werror
 CPP_FLAGS += -Wextra
 CPP_FLAGS += -std=c++98
-endif
 
 CPP_FLAGS += -g
 CPP_FLAGS += -fsanitize=address

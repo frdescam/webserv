@@ -63,7 +63,7 @@ void server::initialize(void) {
 
 void server::run(void) {
 	initialize();
-	size_t				read_bytes;
+	int				read_bytes;
 	std::vector<int>	chunks;
 	request_handler header(_s);
 	client_handler client;
@@ -119,7 +119,7 @@ void server::run(void) {
 }
 
 int server::is_new_client(int fd) {
-	for (int i = 0; i < _s.size(); ++i)
+	for (size_t i = 0; i < _s.size(); ++i)
 	{
 		if (fd == _s[i].socket)
 			return i;

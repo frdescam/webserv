@@ -32,8 +32,8 @@ class config_checker
 	    return  _str.c_str();
 	  }
 	  private :
-	  std::string _str;
 	  info_vector _si;
+	  std::string _str;
 	};
 
 /* 

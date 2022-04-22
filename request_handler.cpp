@@ -10,6 +10,7 @@
 		curl --resolve test_server_block.com:9090:127.0.0.1 http://test_server_block.com:9090/ -X GET
 */
 
+#include <sstream>
 #include "cgi_handler.hpp"
 #include "request_handler.hpp"
 
@@ -267,14 +268,14 @@ void request_handler::set_server_id(void)
 	// PROBLEM : SPARADRAP
 //	if (host == "127.0.0.1") host = "localhost";
 	string port(_hrx["Host:"][0].substr(colon_pos +1));
-	for (int i = 0; i < _si.size(); ++i)
+	for (size_t i = 0; i < _si.size(); ++i)
 		if ( (_si[i].host == host || _si[i].server_name == host) && _si[i].port == port ) {
 			_s_id = i;
 			cout << RED "_s_id : " RESET << _s_id << endl;
 			return ;
 		}
 // SI LE HOST:PORT N'A PAS ETE TROUVE ON SELECT LE PREMIER SERVER CORRESPONDANT
-	for (int i = 0; i < _si.size(); ++i)
+	for (size_t i = 0; i < _si.size(); ++i)
 		if (_si[i].port == port)
 			_s_id = i; // PROBLEM ?
 #ifdef _debug_
@@ -303,7 +304,7 @@ void request_handler::handle_post_rqst(void)
 
 	if (_hrx.find("Content-Type:") != _hrx.end())
 		cout << "_hrx['Content-Type:'].size() : " << _hrx["Content-Type:"].size() << " :" << endl;
-	for (auto i = _hrx["Content-Type:"].begin(); i != _hrx["Content-Type:"].end(); i++)
+	for (vector<std::string>::iterator i = _hrx["Content-Type:"].begin(); i != _hrx["Content-Type:"].end(); i++)
 		cout << "[" << *i << "]" << endl;
 
 // POUR LIMITER LA TAILLE DU BODY DU CLIENT => JE NE SAIT PAS ENCORE COMMENT GET LA LOCATION CONCERNÉE
@@ -316,7 +317,7 @@ void request_handler::handle_post_rqst(void)
 //	cout << _hrx["BODY"][0] << endl;
 
 	// En cas de body plus long qu'autorisé -> 413 (Request Entity Too Large) 
-	if (!_si[_s_id].max_file_size.empty() && _hrx["BODY"][0].size() > atoi(_si[_s_id].max_file_size.c_str()) ) {
+	if (!_si[_s_id].max_file_size.empty() && (int)_hrx["BODY"][0].size() > atoi(_si[_s_id].max_file_size.c_str()) ) {
 	std::cout << "YOLO" << std::endl;
 		gen_startLine( _status.find("413") ); 
 		return ;
@@ -339,7 +340,7 @@ void request_handler::handle_post_rqst(void)
 			_hrx["A"][1] = "./files/";
 			_hrx["A"][1].append(tmp.substr(pos + strlen("filename=\""), tmp.substr(pos + strlen("filename=\"")).find("\"")));
 		}
-		std::ofstream	output(_hrx["A"][1]);
+		std::ofstream	output(_hrx["A"][1].c_str());
 		if (!boundary.empty())
 		{
 				pos = _hrx["BODY"][0].find(boundary);
@@ -392,13 +393,14 @@ int	request_handler::resolve_path()
 						if ( !it->retour[0].empty() && c_it == it->retour[0].end())
 							gen_startLine( _status.find(it->retour[0]) );
 
-						_path = it2->root.back() == '/' ? it2->root : it2->root + "/";
+                        ;
+						_path = *(it2->root.c_str() + strlen(it2->root.c_str()) - 1) == '/' ? it2->root : it2->root + "/";
 						_l_id = it2 - _si[_s_id].location.begin();
 						break ;
 					}
 			} // SINON
 			else {
-				_path = it->root.back() == '/' ? it->root : it->root + "/";
+				_path = *(it->root.c_str() + strlen(it->root.c_str()) - 1) == '/' ? it->root : it->root + "/";
 				_l_id = index;
 			}
 			// _path += it->location.back() == '/' ? it->location : it->location + "/";
@@ -421,7 +423,7 @@ int	request_handler::resolve_path()
 
 // VERIFIE SI LA MÉTHODE DS LA LOCATION CONCERNÉE EST AUTORISÉE
 	bool allowed = false;
-	for (int i = 0; i < _si[_s_id].location[_l_id].allowed_method.size(); ++i)
+	for (size_t i = 0; i < _si[_s_id].location[_l_id].allowed_method.size(); ++i)
 		if (_si[_s_id].location[_l_id].allowed_method[i] == _hrx["A"][0])
 			allowed = true;
 	if (!allowed)
@@ -435,7 +437,8 @@ int	request_handler::resolve_path()
 int request_handler::file_type()
 {
 	cout << GREEN "DS FILE_TYPE()" RESET <<  " _path : " << _path << endl;
-	struct stat sb = {0}; // à la place de : bzero(&sb, sizeof(sb));
+	struct stat sb;
+    bzero(&sb, sizeof(sb));
 	if (lstat(_path.c_str(), &sb) == -1)
 		perror("lstat");
 
@@ -521,7 +524,7 @@ void request_handler::add_body()
 // S'IL S'AGIT D'UN GET OU D'UN POST ON JOINS LE FICHIER
 	if (_hrx["A"][0] == "GET" || _hrx["A"][0] == "POST") {
 		cout << RED "File written !" RESET  << endl;
-		ifstream fs(_path);
+		ifstream fs(_path.c_str());
 		_response.append((istreambuf_iterator<char>(fs)),
 						 (istreambuf_iterator<char>() ));
 	}
@@ -599,7 +602,9 @@ void	request_handler::handle_cgi(void)
 //			_response += "Connection: close\r\n";
 		}
 		_response += "Content-Lenght: ";
-		_response += std::to_string(k - 1);
+        std::ostringstream s;
+        s << k - 1;
+		_response += s.str();
 		_response += "\r\n";
 		if (!_hrx["Content-Type"].empty())
 		{

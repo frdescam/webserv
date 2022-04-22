@@ -1,5 +1,6 @@
 #include "client_handler.hpp"
 #include "color.hpp"
+#include <stdio.h>
 
 
 client_handler::client_handler(/* args */)
@@ -123,6 +124,7 @@ bool client_handler::is_chunked_rqst_fulfilled(client_info& client)
 				std::cout << tmp.length() << std::endl;
 			}
 			*/
+            pos = 0;
 			if (client._cLen > client.rqst.length())
 			{
 				std::cout << "dans cLen is set" << std::endl;
@@ -130,7 +132,6 @@ bool client_handler::is_chunked_rqst_fulfilled(client_info& client)
 			}
 			else
 			{
-		std::cout << " COUCOU" << std::endl;
 				if (client._cLen < tmp.length())
 					client.rqst = client.rqst.substr(0, pos + strlen(client.post_boundary.c_str()) + client._cLen);
 				if (client.rqst.substr(0, 5) == "CHUNK")
@@ -148,7 +149,8 @@ bool client_handler::is_chunked_rqst_fulfilled(client_info& client)
 			tmp = client.rqst.substr(pos + strlen("Content-Length: "));
 			if ((pos = tmp.find("\r\n")) != std::string::npos)
 				tmp = tmp.substr(0, pos);
-			ss = std::stringstream(tmp);
+			std::stringstream ss;
+            ss << tmp;
 			ss >> client._cLen;
 			if (client._cLen > MAX_LEN)
 			{
@@ -172,7 +174,6 @@ bool client_handler::is_chunked_rqst_fulfilled(client_info& client)
 bool client_handler::is_post_rqst_fulfilled(client_info& client)
 {
 	size_t				pos;
-	size_t				cur_len;
 	std::string			tmp;
 	std::stringstream	ss;
 
@@ -188,7 +189,8 @@ bool client_handler::is_post_rqst_fulfilled(client_info& client)
 		tmp = client.rqst.substr(pos + strlen("Content-Length: "));
 		if ((pos = tmp.find("\r\n")) != std::string::npos)
 			tmp = tmp.substr(0, pos);
-		ss = std::stringstream(tmp);
+		std::stringstream ss;
+        ss << tmp;
 		ss >> client._cLen;
 		std::cout << "Len was set:" << client._cLen << std::endl;
 		if (client._cLen > MAX_LEN)
@@ -248,7 +250,7 @@ int	client_handler::chunked_rqst(struct_epoll& _epoll, int fd)	{
 	size_t	read_bytes;
 	char	str[MAX_LEN];
 
-	if ((read_bytes = recv(fd, str, sizeof(str), MSG_DONTWAIT)) != -1)
+	if ((int)(read_bytes = recv(fd, str, sizeof(str), MSG_DONTWAIT)) != -1)
 	{
 		this->rqst_append(fd, str, read_bytes);
 		this->time_reset(_epoll, this->clients[fd].time_out, fd);
@@ -330,7 +332,6 @@ int	client_handler::chunked_resp(struct_epoll& _epoll, int fd)	{
 
 std::vector<int>	client_handler::handle_chunks(struct_epoll& _epoll)	{
 	std::vector<int>	ret;
-	char *str[MAX_LEN];
 
 	for (std::map<int, client_info>::iterator it = clients.begin(); it != clients.end(); it++)
 	{
@@ -361,6 +362,7 @@ std::vector<int>	client_handler::handle_chunks(struct_epoll& _epoll)	{
 
 void client_handler::time_reset(struct_epoll& _epoll, int time_out, int fd)
 {
+    (void)_epoll;
 	if (!clients.empty() && clients.find(fd) != clients.end())
 	{
 		clients[fd].time_out = time_out;
