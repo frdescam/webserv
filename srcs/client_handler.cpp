@@ -4,6 +4,7 @@
 
 client_handler::client_handler(struct_epoll &epoll, request_handler& rqst) : _epoll(epoll), _rqst(rqst)
 {
+	(void)_rqst;
 #ifdef _log_
 	ofstream _LOGfile("log.txt", std::ofstream::trunc);
 	if (!_LOGfile.is_open())

@@ -4,7 +4,7 @@
 #include "client_handler.hpp"
 #include <stdexcept>
 
-#include <unistd.h> // Pour close, À ENLEVER
+#include <unistd.h>
 
 using namespace std;
 bool _run = true;      // Initialisé à true tant qu'il n'y a pas de SIGINT
@@ -17,7 +17,7 @@ server::server(std::string av)
 		confCheck.check_conFile(av);
 	else 
 		throw std::runtime_error("Bad configuration file given");
-	this->_s = *confCheck._si; // je voulais le passer par reference mais pas possible av l'architecture actuelle
+	this->_s = *confCheck._si;
 }
 
 server::~server()

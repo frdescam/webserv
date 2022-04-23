@@ -23,8 +23,8 @@ class config_checker
 	class configException: public std::exception
 	{
 	  public :
-	  configException(info_vector si): _si(si), _str("Config File : error.") {};
-	  configException(info_vector si, std::string str) : _si(si), _str(str + "\nConfig File : error.") {};
+	  configException(info_vector si): _si(si), _str("Config File : error.") {(void)_si;};
+	  configException(info_vector si, std::string str) : _si(si), _str(str + "\nConfig File : error.") {(void)_si;};
 	  ~configException() throw() {};
 	  virtual const char* what() const throw()
 	  {
