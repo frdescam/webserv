@@ -1,5 +1,4 @@
 SRC += srcs/main.cpp
-SRC += srcs/cgi_handler.cpp
 SRC += srcs/config_checker.cpp
 SRC += srcs/server.cpp
 SRC += srcs/request_handler.cpp

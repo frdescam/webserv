@@ -8,14 +8,13 @@ using namespace std;
 
 int main(int ac, char const *av[])
 {
-	if (ac != 2)
-		// exit(EXIT_FAILURE);
-//	 av[1] = "./configuration_files/valid/default.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
-	av[1] = "./configuration_files/valid/simple.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
+	if (ac == 1)
+		av[1] = "./configuration_files/valid/test.conf"; // Pour ne pas avoir à ajouter de fichier config manuellement à chaque fois
+	cout << YELLOW "# configuration file " << av[1] << RESET << endl;
 	try
 	{
 		server webserv(av[1]);
-		webserv.display_server(); // A utilité de check : peut être enlevé...
+		// webserv.display_server(); // A utilité de check : peut être enlevé...
 		webserv.run();
 	}
 	catch(const exception& e)

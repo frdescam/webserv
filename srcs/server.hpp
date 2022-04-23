@@ -1,17 +1,14 @@
 #ifndef _SERVER_HPP_ 
 #define _SERVER_HPP_
-#include <sys/socket.h>	// pour socket()
+#include "color.hpp"
+# include <signal.h>    // pour le signal Ctrl-C
 #include <sys/types.h>	// 
 #include <sys/epoll.h>	// for epoll_create1(), epoll_ctl(), struct epoll_event 
-#include "color.hpp"
+#include <sys/socket.h>	// pour socket()
 #include "struct_webserv.hpp"
-
-class client_handler;
-class request_handler;
 
 class server
 {
-#define MAX_LEN 8192
 #define MAX_EVENTS 1000
 #define BUF_LEN 1000000
 
@@ -20,8 +17,7 @@ private:
     std::vector<server_info> _s;
     struct_epoll _epoll;
  
-    char str[MAX_LEN];
-    char msg[MAX_LEN];
+    char str[BUF_LEN];
 
 public:
     server(std::string);
@@ -31,9 +27,8 @@ public:
     void run(void); // lance les étapes de configuration des sockets initialize(), de run
 
     /* PRIVATE */
-    int is_new_client(int fd);
+    size_t is_new_client(int fd);
     int get_time_out(int id_serv);
-	void	response_handler(client_handler&, request_handler&, int fd);
 };
 
 #endif

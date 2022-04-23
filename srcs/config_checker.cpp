@@ -116,8 +116,10 @@ void config_checker::check_conFile(std::string str)
 {
 	return false;
 }
+
 void config_checker::string_vector_insert(ifstream& ifs, string &where_to_insert)
 {
+
 } */
 
 void config_checker::valid_port(std::ifstream& ifs, server_info& si)
@@ -188,11 +190,9 @@ void config_checker::check_serv_part(std::ifstream& ifs, server_info& si) {
 			extract_to_string(ifs, si.time_out);
 			std::cout << "time_out : " << si.time_out << std::endl;
 		}
-		else if (word == "cgi_file_types" /* && ifs >> word */) {
-			// si.cgi_file_types.push_back(word);
-			std::cout << "cgi_file_types : ";
-			extract_to_vector(ifs, si.cgi_file_types);
-			// std::cout << "cgi_file_types : " << si.cgi_file_types[si.cgi_file_types.size() - 1] << std::endl;
+		else if (word == "cgi_path") {
+			extract_to_string(ifs, si.cgi_path);
+			std::cout << "cgi_path : " << si.cgi_path << std::endl;
 		}
 		else if (word == "location") {
 			check_loca_part(ifs, si);  // ?
@@ -227,9 +227,9 @@ void config_checker::check_loca_part(std::ifstream& ifs, server_info& si){
 	for (ifs >> word; word != "}"; /* cout << BLUE "loca_tour de boucle word1 : " RESET << word << " bracket : " << bracket << endl, */ ifs >> word) {
 		if (word == "allowed_method")
 			extract_to_vector(ifs, si.location[si.location.size() - 1].allowed_method);
-		else if (word == "auth_basic") {
-			extract_to_string(ifs, si.location[si.location.size() - 1].auth_basic);
-			std::cout << GREEN "auth_basic : " RESET << si.location[si.location.size() - 1].auth_basic << std::endl;
+		else if (word == "download_path") {
+			extract_to_string(ifs, si.location[si.location.size() - 1].download_path);
+			std::cout << GREEN "download_path : " RESET << si.location[si.location.size() - 1].download_path << std::endl;
 		}
 		else if (word == "auth_user_file") {
 			extract_to_string(ifs, si.location[si.location.size() - 1].auth_user_file);
@@ -256,6 +256,14 @@ void config_checker::check_loca_part(std::ifstream& ifs, server_info& si){
 		else if (word == "root") {
 			extract_to_string(ifs, si.location[si.location.size() - 1].root);
 			std::cout << GREEN "root : " RESET << si.location[si.location.size() - 1].root << std::endl;
+		}
+		else if (word == "cgi_path") {
+			extract_to_string(ifs, si.location[si.location.size() - 1].cgi_path);
+			std::cout << "cgi_path : " << si.location[si.location.size() - 1].cgi_path << std::endl;
+		}
+		else if (word == "cgi_file_types" /* && ifs >> word */) {
+			extract_to_vector(ifs, si.location[si.location.size() - 1].cgi_file_types);
+			// std::cout << "cgi_file_types : " << si.cgi_file_types[si.cgi_file_types.size() - 1] << std::endl;
 		}
 		else if (word == "{" || word == "}")
 			word == "{" ? ++bracket : --bracket;
