@@ -1,4 +1,0 @@
-#!/bin/php
-	<?php
-		phpinfo();
-	?>
