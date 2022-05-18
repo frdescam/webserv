@@ -12,8 +12,7 @@ class Cgi
 		~Cgi(void);
 		Cgi(Cgi const & other);
 		Cgi(std::string path, bool post, std::string infile, std::map<std::string, std::string> env_vars);
-		Cgi & operator=(Cgi const & other);
-
+		Cgi		&operator=(Cgi const & other);
 		void	execute(void);
 
 	private:
@@ -21,8 +20,6 @@ class Cgi
 		std::string                         _path_to_cgi;
 		std::string                         _infile;
 		std::map<std::string, std::string>  _env_vars;
-
-		char	**_create_env_tab(void);
 };
 
 #endif

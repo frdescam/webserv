@@ -170,25 +170,14 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 	int 			rc = -1;
 	std::string		buf(BUFFER_SIZE + 1, '\0');
 
-	//if (!buffer)
-	//	throw std::runtime_error("Error: Malloc\n");
-	//buffer[0] = '\0';
-	//buffer[1] = 0;
-	//std::cout << buffer << "\n";
-	//strcpy(buffer, "");
-	//std::cout << buffer << "\n";
-	//rc = recv(it->fd, buffer, BUFFER_SIZE, 0);
 	rc = recv(it->fd, (void *)buf.c_str(), BUFFER_SIZE, 0);
 	if (rc <= 0)
 	{
 		this->_closeConnection(it);
-		//free(buffer);
 		return (1);
 	}
-	//buffer[rc] = '\0';
 	if (client->second.getRequestPtr() != NULL)					// REQUEST ALREADY EXISITNG
 	{
-		//std::cout << buf << "\n";
 		if (!client->second.getRequestPtr()->getFlag())
 			client->second.addToRequest(buf.c_str(), rc, client->second.getRequestPtr()->getConf());
 	}
@@ -202,16 +191,13 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 		host.append(uri);
 		this->_verifyHost(host);
 		std::string configName = this->_getRightConfigName(host);
-		//std::cout << configName << " " << host << "\n";
 		if (configName == "")
 		{
 			this->_closeConnection(it);
-			//free(buffer);
 			return (1);
 		}
 		client->second.addToRequest(buf.c_str(), rc, _config.at(configName));
 		//std::cout << client->second.getRequestPtr()->isChunked() << "\n";
-		//std::cout << buf << "\n";
 		struct pollfd client_request_pollfd = client->second.getRequestPollFd();
 		if (client_request_pollfd.fd != -1)						// IF REQUEST POST
 		{
@@ -219,11 +205,9 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 			this->_pollfds.push_back(client_request_pollfd);
 			this->_requests_fd.push_back(client_request_pollfd.fd);
 			this->_fd_request_client.insert(std::pair<int, Request *>(client_request_pollfd.fd, client->second.getRequestPtr()));
-			//free(buffer);
 			return (2);
 		}
 	}
-	//free(buffer);
 	return (0);
 }
 
@@ -248,11 +232,11 @@ bool	Server::_pollin(std::vector<pollfd>::iterator	it)			// READING
 		if (client != this->_socket_clients.end())
 		{
 			ret = this->_receiving(it, client);
-			std::cout << "receiving: " << ret << "\n";
+			//std::cout << "receiving: " << ret << "\n";
 			if (ret == 1)
 				return (1);
 			Request * ptr = client->second.getRequestPtr();
-			std::cout << "complete " << ptr->isComplete() << "\n";
+			//std::cout << "complete " << ptr->isComplete() << "\n";
 			if (ptr != 0 && (ptr->isComplete() || (ptr->isChunked() && !ptr->sentContinue())))
 			{
 				//std::cout << "A\n";

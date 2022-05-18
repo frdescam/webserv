@@ -4,14 +4,11 @@ Request::Request(void): _block(), _path_to_cgi(""), _tmp_file(""),
  _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
  _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0), _body_part("")
 {
-	//this->_body_part = NULL;
 	this->_fp = NULL;
 }
 
 Request::~Request(void)
 {
-	//if (this->_body_part != NULL)
-	//	free(this->_body_part);
 	if (this->_post)
 		remove(this->_tmp_file.c_str());
 	if (this->_cgi)
@@ -23,22 +20,12 @@ Request::Request(const Request & other): _block(other._block), _path_to_cgi(othe
 	_sent_continue(other._sent_continue),  _last_chunk_received(other._last_chunk_received), _body_part_len(other._body_part_len), _length_body(other._length_body), _length_header(other._length_header), _length_received(other._length_received),
 	_length_of_chunk(other._length_of_chunk), _fd(other._fd), _flag(other._flag), _env_vars(other._env_vars)
 {
-	//this->_body_part = NULL;
 	this->_fp = other._fp;
 	if (this->_body_part_len > 0)
-	{
 		this->_body_part = other._body_part;
-	/*
-		this->_body_part = (char *)malloc(sizeof(char) * (this->_body_part_len + 1));
-		if (this->_body_part == NULL)
-			throw std::runtime_error("Error: Malloc\n");
-		this->_body_part = (char *)memcpy(this->_body_part, other._body_part, this->_body_part_len);
-		this->_body_part[this->_body_part_len] = '\0';
-	*/
-	}
 }
 
-Request & Request::operator=(const Request & other)
+Request	&Request::operator=(const Request & other)
 {
 	if (this != &other)
 	{
@@ -61,24 +48,8 @@ Request & Request::operator=(const Request & other)
 		this->_flag = other._flag;
 		this->_env_vars = other._env_vars;
 		this->_fp = other._fp;
-		/*
-		if (this->_body_part != NULL)
-		{
-			free(this->_body_part);
-			this->_body_part = NULL;
-		}
-		*/
 		if (this->_body_part_len > 0)
-		{
 			this->_body_part = other._body_part;
-			/*
-			this->_body_part = (char *)malloc(sizeof(char) * (this->_body_part_len + 1));
-			if (this->_body_part == NULL)
-				throw std::runtime_error("Error: operateur = Malloc\n");
-			this->_body_part = (char *)memcpy(this->_body_part, other._body_part, this->_body_part_len);
-			this->_body_part[this->_body_part_len] = '\0';
-			*/
-		}
 	}
 	return (*this);
 }
@@ -104,7 +75,7 @@ Request::Request(const char * request_str, int rc, Config & block, int id): _blo
 	else
 		this->_env_vars["UPLOAD_STORE"] = this->_block.getUploadFolder();
 
-	Parser parser(_env_vars, _block);
+	Parser	parser(_env_vars, _block);
 	this->_env_vars = parser.parseOutputClient(request_string);
 	this->_block = parser.getBlock();
 	this->_post = parser.isPost();
@@ -157,6 +128,7 @@ void	Request::_initPostRequest(const char *request_str, int rc, int id) {
 	this->_header_completed = true;
 }
 
+// TODO check each getter
 bool										Request::isComplete(void) { return this->_completed; }
 bool										Request::isChunked(void) { return this->_chunked; }
 bool										Request::isPost(void) { return this->_post; }
@@ -168,13 +140,8 @@ void										Request::setSentContinue(bool val) { this->_sent_continue = val;}
 int											Request::getFd(void) { return this->_fd; }
 int											Request::getFlag(void) { return this->_flag; }
 FILE								*		Request::getFp(void) { return this->_fp; }
-void										Request::setFpToNull(void)
-{
-	this->_fp = NULL;
-}
-/*********************************************************/
-/***********************EXECUTION*************************/
-/*********************************************************/
+void										Request::setFpToNull(void) { this->_fp = NULL; }
+
 Response	Request::executeChunked(void)
 {
 	Response r;
@@ -200,9 +167,6 @@ Response	Request::execute(void) {
 		return (r);
 	}
 
-	//Response (Request::*ptr [])(Response) = {&Request::_executeDelete, &Request::_executeGet, &Request::_executePost};
-	//std::vector<std::string> methods ("DELETE", "GET", "POST", "0");
-
 	//std::cout << this->_env_vars["SCRIPT_NAME"] << "\n";
 	if (this->_env_vars["SERVER_PROTOCOL"].compare("HTTP/1.1"))
 		r.error("505");
@@ -215,14 +179,12 @@ Response	Request::execute(void) {
 			r.error("411");
 			return (r);
 		}
+		//std::cout << this->_env_vars["SCRIPT_FILENAME"] << "\n";
 		this->_cgi = true;
 		if (pathIsFile(this->_env_vars["SCRIPT_FILENAME"]) == 1)
 		{
-			// TODO check weird return of curl when cgi php heres
 			Cgi c(this->_path_to_cgi, this->_post, this->_tmp_file, this->_env_vars);
-			//std::cout << _path_to_cgi << "\n";
 			c.execute();
-			//exit(0)
 			if (this->_post)
 				r.createCgiPost(std::string("cgi_" + this->_tmp_file).c_str(), this->_env_vars["UPLOAD_STORE"]);
 			else
@@ -232,10 +194,14 @@ Response	Request::execute(void) {
 			r.error("404");
 		else
 			r.error("400");
-		//std::cout << this->_env_vars["SCRIPT_FILENAME"] << "\n";
 	}
 	else
 	{
+		//Response (Request::*ptr [])(Response) = {&Request::_executeDelete, &Request::_executeGet, &Request::_executePost};
+		//std::string methods[] = {"DELETE", "GET", "POST", "0"};
+		//for(size_t i = 0; methods[i].compare("0"); i++)
+		//	if (!this->_env_vars["REQUEST_METHOD"].compare(methods[i]))
+		//		return (this->*ptr[i])(r);
 		//std::cout << _env_vars["REQUEST_METHOD"] << "\n";
 		if (!this->_env_vars["REQUEST_METHOD"].compare("GET"))
 			return (this->_executeGet(r));
@@ -250,18 +216,18 @@ Response	Request::execute(void) {
 
 Response	Request::_executeDelete(Response r)
 {
-    int res;
-    std::string path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
+    int			res;
+    std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
 
-	if (!this->_block.getAlowMethods().empty() && std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "DELETE") == this->_block.getAlowMethods().end()) {
+	if (!this->_block.getAlowMethods().empty() && std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "DELETE") == this->_block.getAlowMethods().end())
+	{
 		r.error("405");
 		return r;
 	}
 	if (path[path.size() - 1] == '/')
 		path.erase(path.size() - 1);
 	ret_check_path = check_path(path);
-
     if (ret_check_path == -1)
 		r.error("404");
 	else if (ret_check_path == 4)
@@ -298,7 +264,7 @@ Response	Request::_executeDelete(Response r)
 
 Response	Request::_executeGet(Response r)
 {
-	std::string path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
+	std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
 
 	//std::cout << path << "\n";
@@ -337,8 +303,8 @@ Response	Request::_executePost(Response r)
 	return(r);
 }
 
-Response	Request::_executeRedirection(Response r) {
-
+Response	Request::_executeRedirection(Response r)
+{
 	if (this->_block.getRedirection().first.compare("301") == 0)
 		r.createRedirection(this->_block.getRedirection().second);
 	else
@@ -346,53 +312,27 @@ Response	Request::_executeRedirection(Response r) {
 	return r;
 }
 
-void Request::addToBody(const char * request_str, int pos, int len)
+// TODO stop using chars
+void Request::addToBody(const char *request_str, int pos, int len)
 {
 	std::string	tmp(request_str, pos, len);
-	//std::cout << tmp << "\n";
-	//std::cout << _body_part << "\n";
 	this->_body_part += tmp;
-	//std::cout << _body_part << "\n";
-	//exit(0);
-	/*
-	if (this->_body_part != NULL)
-	{
-		char * new_body_part = NULL;
-		new_body_part = (char *)malloc(sizeof(char) * (this->_body_part_len + len + 1));
-		if (new_body_part == NULL)
-			throw std::runtime_error("Error: addToBody Malloc\n");
-		new_body_part = (char *)memcpy(new_body_part, this->_body_part, this->_body_part_len);
-		memcpy(&new_body_part[this->_body_part_len], &request_str[pos], len);
-		free(this->_body_part);
-		this->_body_part = new_body_part;
-	}
-	else
-	{
-		if (!(this->_body_part = (char *)malloc(sizeof(char) * (len + 1))))
-			throw std::runtime_error("Error: addToBody Malloc\n");
-		this->_body_part = (char *)memcpy(this->_body_part, &request_str[pos], len);
-	}
-	*/
 	this->_body_part_len += len;
-	//this->_body_part[this->_body_part_len] = '\0';
 }
 
 int	Request::writeInFile(void)
 {
-	int i = 0;
+	int	i = 0;
 
 	if (this->_body_part_len != 0)
 	{
 		i = write(this->_fd, this->_body_part.c_str(), this->_body_part_len);
 		if (i <= 0)
-		{
 			return (i);
-		}
 		this->_addToLengthReceived(i);
 		if (this->_chunked)
 			this->_checkLastBlock();
-		//free(this->_body_part);
-		this->_body_part = "";
+		this->_body_part.clear();
 		this->_body_part_len = 0;
 	}
 	else
@@ -423,7 +363,7 @@ void	Request::_addToLengthReceived(size_t length_to_add)
 		this->_completed = true;
 }
 
-void Request::addToBodyChunked(const char * request_str, int len)
+void Request::addToBodyChunked(const char *request_str, int len)
 {
 	if (len == 0)
 		return ;
@@ -448,7 +388,6 @@ void Request::addToBodyChunked(const char * request_str, int len)
 		}
 		else
 			begin = 0;
-		
 		if (this->_length_of_chunk == 0)
 		{
 			this->_last_chunk_received = true;
@@ -467,9 +406,9 @@ void Request::addToBodyChunked(const char * request_str, int len)
 		{
 			this->addToBody(request_str, begin, len - begin);
 			this->_length_of_chunk -= (len - begin);
-			break ;
+			break;
 		}
 		if (i >= len)
-			break ;
+			break;
 	}
 }
