@@ -232,11 +232,11 @@ bool	Server::_pollin(std::vector<pollfd>::iterator	it)			// READING
 		if (client != this->_socket_clients.end())
 		{
 			ret = this->_receiving(it, client);
-			//std::cout << "receiving: " << ret << "\n";
+			std::cout << "receiving: " << ret << "\n";
 			if (ret == 1)
 				return (1);
 			Request * ptr = client->second.getRequestPtr();
-			//std::cout << "complete " << ptr->isComplete() << "\n";
+			std::cout << "complete " << ptr->isComplete() << "\n";
 			if (ptr != 0 && (ptr->isComplete() || (ptr->isChunked() && !ptr->sentContinue())))
 			{
 				//std::cout << "A\n";
@@ -365,7 +365,6 @@ bool	Server::_checkingRevents(void)
 		}
 		else if (it->revents & POLLIN)
 		{
-			//std::cout << "yo" << POLLIN << "\n";
 			int i = _pollin(it);
 			std::cout << "pollin: "<< i << "\n";
 			if (i)

@@ -315,8 +315,8 @@ Response	Request::_executeRedirection(Response r)
 // TODO stop using chars
 void Request::addToBody(const char *request_str, int pos, int len)
 {
-	std::string	tmp(request_str, pos, len);
-	this->_body_part += tmp;
+	//std::cout << pos << " " << len << " " << "\n";
+	this->_body_part.append(&request_str[pos], &request_str[pos + len]);
 	this->_body_part_len += len;
 }
 
@@ -366,7 +366,7 @@ void	Request::_addToLengthReceived(size_t length_to_add)
 void Request::addToBodyChunked(const char *request_str, int len)
 {
 	if (len == 0)
-		return ;
+		return;
 	std::string 				hexa = "";
 	size_t 						begin = 0;
 	int							i = 0;
@@ -380,7 +380,6 @@ void Request::addToBodyChunked(const char *request_str, int len)
 				hexa.push_back(request_str[i]);
 				i++;
 			}
-			
 			std::stringstream ss;
 			ss << std::hex << hexa;
 			ss >> this->_length_of_chunk;
@@ -391,7 +390,7 @@ void Request::addToBodyChunked(const char *request_str, int len)
 		if (this->_length_of_chunk == 0)
 		{
 			this->_last_chunk_received = true;
-			break ;
+			break;
 		}
 		if (this->_length_of_chunk <= len - begin)
 		{
