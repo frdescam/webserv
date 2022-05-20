@@ -23,7 +23,7 @@ class Server
 
 		void	config(const char * conf_file);
 		int		setup(void);
-		bool	run(void);
+		void	run(void);
 		void	clean(void);
 
 	private:
@@ -48,7 +48,6 @@ class Server
 		std::string			_getRightConfigName(std::string host);
 		void				_verifyHost(std::string & host);
 		void				_getHostInBuffer(std::string buffer, std::string &host, std::string &uri);
-		std::vector<int>	_getPorts();
 		void				_setClientPollFd(std::vector<pollfd>::iterator	it, int event);
 		std::vector<std::vector<std::string> >	_getConfOfFile(const char *conf);
 

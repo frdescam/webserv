@@ -313,6 +313,7 @@ Response	Request::_executeRedirection(Response r)
 }
 
 // TODO stop using chars
+// USE iterators!
 void Request::addToBody(const char *request_str, int pos, int len)
 {
 	//std::cout << pos << " " << len << " " << "\n";

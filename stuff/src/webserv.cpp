@@ -6,7 +6,7 @@
 /*   By: tpierre <tpierre@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/10 15:40:04 by ymehdi            #+#    #+#             */
-/*   Updated: 2022/05/17 00:21:04 by ltouret          ###   ########.fr       */
+/*   Updated: 2022/05/19 18:11:52 by ltouret          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ int		main(int ac, char **av)
 			server.config(DEFAULT_CONFIG);
 		if (!server.setup())
 		{
-			while (!g_end)
-				g_end = server.run();
+			//while (!g_end)
+				//g_end = server.run();
+			server.run();
 		}
-		//server.clean();
 	}
 	catch (std::exception &e) {
 		std::cerr << e.what() << std::endl;

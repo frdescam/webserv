@@ -43,11 +43,11 @@
 
 	extern bool	g_end;
 
-	std::vector<std::string> mySplit(std::string s, std::string charset);
-	int	pathIsFile(const std::string& path);
-	int check_path(std::string path);
-	int check_read_rights(std::string path);
-	int check_execute_rights(std::string path);
-	int check_wright_rights(std::string path);
+	std::vector<std::string>	mySplit(std::string s, std::string charset);
+	int							pathIsFile(const std::string &path);
+	int							check_path(const std::string &path);
+	int							check_read_rights(const std::string &path);
+	int							check_execute_rights(const std::string &path);
+	int							check_wright_rights(const std::string &path);
 
 #endif

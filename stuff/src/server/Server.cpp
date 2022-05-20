@@ -25,16 +25,6 @@ Server & Server::operator=(const Server & other)
 	return (*this);
 }
 
-// _getPorts is usless can be erased
-std::vector<int> Server::_getPorts() {
-
-	std::vector<int> ports;
-
-	for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
-		ports.push_back(it->second.getPort());
-	return ports;
-}
-
 void Server::_verifyHost(std::string & host) {
 
 	if (host.find("localhost") != std::string::npos)
@@ -43,14 +33,13 @@ void Server::_verifyHost(std::string & host) {
 		host.replace(0, 7, "127.0.0.1");
 }
 
-// TODO change conf_file to std::string
-void	Server::config(const char * conf_file)
+void	Server::config(const char *conf_file)
 {
-	std::string tmp(conf_file);
-	if (tmp.find(".conf") == std::string::npos) // fix this, if file.conf* works and shouldnt!
-		throw std::runtime_error("Error: File incorrect type\n");
-	if (pathIsFile(conf_file) != 1)
-		throw std::runtime_error("Error: File incorrect\n");
+	std::string	tmp(conf_file);
+	if (tmp.size() <= 5 || tmp.compare(tmp.size() - 5, 5, ".conf") != 0)
+		throw std::runtime_error("Error: Wrong file type\n");
+	if (pathIsFile(tmp) != 1)
+		throw std::runtime_error("Error: File doens't exist or is incorrect\n");
 	this->_fileToServer(conf_file);
 }
 
@@ -164,6 +153,8 @@ bool	Server::_sending(std::vector<pollfd>::iterator	it, std::map<int, Client>::i
 	client->second.addToResponseLength(block_size);
 	return (0);
 }
+
+//TODO fix empty post request with file read function returned funny value
 
 int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::iterator client)
 {
@@ -399,11 +390,17 @@ int	Server::_listenPoll(void) {
 }
 
 // TODO add while server run here isntead of main
-bool	Server::run(void)
+void	Server::run(void)
 {
-	if (this->_listenPoll())
-		return (1);
-	return (this->_checkingRevents());
+	while (!g_end)
+	{
+		if (this->_listenPoll())
+		{
+			g_end = true;
+			return ;
+		}
+		g_end = this->_checkingRevents();
+	}
 }
 
 void Server::_getHostInBuffer(std::string buffer, std::string &host, std::string &uri) {
