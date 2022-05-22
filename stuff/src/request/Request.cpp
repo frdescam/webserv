@@ -1,5 +1,7 @@
 #include "Request.hpp"
 
+// TODO pretty sure theres variables that are not needed here!
+
 Request::Request(void): _block(), _path_to_cgi(""), _tmp_file(""),
  _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
  _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0), _body_part("")
@@ -12,7 +14,7 @@ Request::~Request(void)
 	if (this->_post)
 		remove(this->_tmp_file.c_str());
 	if (this->_cgi)
-		remove(std::string("cgi_" + this->_tmp_file).c_str());
+		remove(("cgi_" + this->_tmp_file).c_str());
 }
 
 Request::Request(const Request & other): _block(other._block), _path_to_cgi(other._path_to_cgi),
@@ -54,14 +56,14 @@ Request	&Request::operator=(const Request & other)
 	return (*this);
 }
 
-Request::Request(const char * request_str, int rc, Config & block, int id): _block(block),
+Request::Request(std::string request_str, int rc, Config & block, int id): _block(block),
 	_path_to_cgi("cgi/php-cgi"), _tmp_file(""),
 	_completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
 	_body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
 	this->_body_part = "";
-	std::string request_string(request_str);
+	//std::string request_string(request_str);
 	this->_initEnvMap();
 	this->_env_vars["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env_vars["DOCUMENT_ROOT"] = _block.getRoot();
@@ -76,7 +78,7 @@ Request::Request(const char * request_str, int rc, Config & block, int id): _blo
 		this->_env_vars["UPLOAD_STORE"] = this->_block.getUploadFolder();
 
 	Parser	parser(_env_vars, _block);
-	this->_env_vars = parser.parseOutputClient(request_string);
+	this->_env_vars = parser.parseOutputClient(request_str);
 	this->_block = parser.getBlock();
 	this->_post = parser.isPost();
 	this->_flag = parser.getFlag();
@@ -112,7 +114,7 @@ void	Request::_initEnvMap(void) {
 		this->_env_vars.insert(std::pair<std::string, std::string>(env_var[i], ""));
 }
 
-void	Request::_initPostRequest(const char *request_str, int rc, int id) {
+void	Request::_initPostRequest(std::string request_str, int rc, int id) {
 
 	std::stringstream ss;
 
@@ -314,9 +316,10 @@ Response	Request::_executeRedirection(Response r)
 
 // TODO stop using chars
 // USE iterators!
-void Request::addToBody(const char *request_str, int pos, int len)
+void Request::addToBody(std::string request_str, int pos, int len)
 {
 	//std::cout << pos << " " << len << " " << "\n";
+	//std::cout << &request_str[pos] << "\n";
 	this->_body_part.append(&request_str[pos], &request_str[pos + len]);
 	this->_body_part_len += len;
 }
@@ -364,7 +367,7 @@ void	Request::_addToLengthReceived(size_t length_to_add)
 		this->_completed = true;
 }
 
-void Request::addToBodyChunked(const char *request_str, int len)
+void Request::addToBodyChunked(std::string request_str, int len)
 {
 	if (len == 0)
 		return;

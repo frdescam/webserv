@@ -4,7 +4,7 @@ Client::Client(void) {}
 
 Client::~Client(void)
 {
-	if (this->_http_request != 0)
+	if (this->_http_request != NULL)
 		delete this->_http_request;
 }
 
@@ -35,8 +35,10 @@ Client & Client::operator=(Client const & other) {
 	return (*this);
 }
 
-void	Client::addToRequest(const char *str, int rc, Config & block)
+// TODO addToBody now with std::string!
+void	Client::addToRequest(std::string str, int rc, Config & block)
 {
+	//std::cout << str << "\n";
 	if (this->_http_request != NULL)
 	{
 		if (this->_http_request->isChunked())
@@ -51,23 +53,25 @@ void	Client::addToRequest(const char *str, int rc, Config & block)
 	this->_request_poll_fd.events = 0;
 }
 
+// do we use dis?
 void	Client::addToResponseLength(size_t block_size)
 {
 	this->_http_response.addToLengthSent(block_size);
 }
 
-Request		*	Client::getRequestPtr(void) { return this->_http_request; }
+Request			*Client::getRequestPtr(void) { return this->_http_request; }
 
+// TODO check if this us used
 void			Client::setId(int new_id) { this->_id = new_id; }
 int				Client::getId(void) { return this->_id; }
 int				Client::getRequestFd(void) { return this->_request_fd; }
-struct pollfd 	Client::getRequestPollFd(void) { return this->_request_poll_fd; }
-struct pollfd &	Client::getClientPollFd(void) { return this->_client_fd; }
-Response	&	Client::getResponse(void) { return this->_http_response; }
+struct pollfd	Client::getRequestPollFd(void) { return this->_request_poll_fd; }
+struct pollfd	&Client::getClientPollFd(void) { return this->_client_fd; }
+Response		&Client::getResponse(void) { return this->_http_response; }
 void 			Client::setResponse(Response & r) { this->_http_response = r; }
 
 void			Client::resetRequest(void)
 {
 	delete this->_http_request;
-	this->_http_request = 0;
+	this->_http_request = NULL;
 }

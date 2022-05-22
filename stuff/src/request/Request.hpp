@@ -6,6 +6,7 @@
 #include "../../inc/webserv.hpp"
 #include "../cgi/Cgi.hpp"
 #include "Parser.hpp"
+//TODO algo???? rm dis
 #include <algorithm>
 
 class Request
@@ -16,15 +17,15 @@ class Request
 		~Request(void);
 		Request(const Request & other);
 		Request & operator=(const Request & other);
-		Request(const char * request_str, int rc, Config &block, int id);
+		Request(std::string request_str, int rc, Config &block, int id);
 
 		bool	isComplete(void);
 		bool	hasHeader(void);
 		bool	isPost(void);
 		bool	isChunked(void);
 		bool	sentContinue(void);
-		void	addToBody(const char * request_str, int pos, int len);
-		void	addToBodyChunked(const char * request_str, int len);
+		void	addToBody(std::string request_str, int pos, int len);
+		void	addToBodyChunked(std::string request_str, int len);
 		int		getFd(void);
 		FILE	*getFp(void);
 		void	setFpToNull(void);
@@ -61,7 +62,7 @@ class Request
 		FILE				*				_fp;
 
 		void		_initEnvMap(void);
-		void 		_initPostRequest(const char *request_str, int rc, int id);
+		void 		_initPostRequest(std::string request_str, int rc, int id);
 		void 		_addToLengthReceived(size_t length_to_add);
 		void		_checkLastBlock(void);
 		Response 	_executeGet(Response r);

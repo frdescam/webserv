@@ -169,8 +169,9 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 	}
 	if (client->second.getRequestPtr() != NULL)					// REQUEST ALREADY EXISITNG
 	{
+		//std::cout << buf << "\n";
 		if (!client->second.getRequestPtr()->getFlag())
-			client->second.addToRequest(buf.c_str(), rc, client->second.getRequestPtr()->getConf());
+			client->second.addToRequest(buf, rc, client->second.getRequestPtr()->getConf());
 	}
 	else														// CREATION OF NEW REQUEST
 	{
@@ -178,7 +179,6 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 		std::string	uri;
 
 		this->_getHostInBuffer(buf, host, uri);
-		//std::cout << buf << "\n";
 		host.append(uri);
 		this->_verifyHost(host);
 		std::string configName = this->_getRightConfigName(host);
@@ -187,7 +187,8 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 			this->_closeConnection(it);
 			return (1);
 		}
-		client->second.addToRequest(buf.c_str(), rc, _config.at(configName));
+		//std::cout << buf << "\n";
+		client->second.addToRequest(buf, rc, _config.at(configName));
 		//std::cout << client->second.getRequestPtr()->isChunked() << "\n";
 		struct pollfd client_request_pollfd = client->second.getRequestPollFd();
 		if (client_request_pollfd.fd != -1)						// IF REQUEST POST
@@ -403,14 +404,15 @@ void	Server::run(void)
 	}
 }
 
+// TODO is c_str her necessary?
 void Server::_getHostInBuffer(std::string buffer, std::string &host, std::string &uri) {
 
 	std::vector<std::string> buff = mySplit(buffer, " \n\t\r");
 	for (std::vector<std::string>::iterator it = buff.begin(); it != buff.end(); it++) {
 		if (it->compare("GET") == 0)
-			uri = (it + 1)->c_str();
+			uri = *(it + 1);
 		if (it->compare("Host:") == 0)
-			host = (it + 1)->c_str();
+			host = *(it + 1);
 	}
 }
 

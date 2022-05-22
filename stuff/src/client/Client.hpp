@@ -12,20 +12,20 @@ class Client
 	public:
 		Client(void);
 		~Client(void);
-		Client(Client const & other);
+		Client(Client const &other);
 		Client(struct pollfd fd);
-		Client & operator=(Client const & other);
+		Client	&operator=(Client const & other);
 
-		Response	&	getResponse(void);
+		Response		&getResponse(void);
 		void 			setResponse(Response & r);
-		void			addToRequest(const char *str, int rc, Config & block);
+		void			addToRequest(std::string str, int rc, Config & block);
 		void			addToResponseLength(size_t block_size);
 		void			setId(int new_id);
 		int 			getId(void);
 		int				getRequestFd(void);
 		struct pollfd	getRequestPollFd(void);
-		struct pollfd	& getClientPollFd(void);
-		Request		*	getRequestPtr(void);
+		struct pollfd	&getClientPollFd(void);
+		Request			*getRequestPtr(void);
 		void			resetRequest(void);
 
 	private:

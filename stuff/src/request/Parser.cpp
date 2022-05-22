@@ -43,7 +43,9 @@ size_t	Parser::getLengthHeader(void) {	return this->_length_header; }
 Config	Parser::getBlock(void) { return this->_block; }
 int		Parser::getFlag(void) { return this->_flag; }
 
-std::map<std::string, std::string> Parser::parseOutputClient(std::string & output) {
+// TODO is the reference useful here?
+std::map<std::string, std::string> Parser::parseOutputClient(std::string &output)
+{
 
 	size_t i = 0;
 
