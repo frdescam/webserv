@@ -11,7 +11,7 @@ Server::~Server(void)
 Server::Server(const Server & other): _config(other._config), _timeout(other._timeout), _total_clients(other._total_clients)
 {}
 
-Server & Server::operator=(const Server & other)
+Server &Server::operator=(const Server &other)
 {
 	if (this != &other)
 	{
@@ -25,7 +25,7 @@ Server & Server::operator=(const Server & other)
 	return (*this);
 }
 
-void Server::_verifyHost(std::string & host) {
+void Server::_verifyHost(std::string &host) {
 
 	if (host.find("localhost") != std::string::npos)
 		host.replace(0, 9, "127.0.0.1");
@@ -33,12 +33,11 @@ void Server::_verifyHost(std::string & host) {
 		host.replace(0, 7, "127.0.0.1");
 }
 
-void	Server::config(const char *conf_file)
+void	Server::config(std::string conf_file)
 {
-	std::string	tmp(conf_file);
-	if (tmp.size() <= 5 || tmp.compare(tmp.size() - 5, 5, ".conf") != 0)
+	if (conf_file.size() <= 5 || conf_file.compare(conf_file.size() - 5, 5, ".conf") != 0)
 		throw std::runtime_error("Error: Wrong file type\n");
-	if (pathIsFile(tmp) != 1)
+	if (pathIsFile(conf_file) != 1)
 		throw std::runtime_error("Error: File doens't exist or is incorrect\n");
 	this->_fileToServer(conf_file);
 }
@@ -62,10 +61,11 @@ int	Server::setup(void)
 		if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			throw std::runtime_error("Error: socket() error\n");
 
-		if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
+		// does this break all??
+		if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (int *) &yes, sizeof(yes)) == -1)
 			throw std::runtime_error("Error: setsockopt() error\n");
 
-		if (ioctl(server_fd, FIONBIO, (char *)&yes) < 0)
+		if (ioctl(server_fd, FIONBIO, &yes) < 0)
 			throw std::runtime_error("Error: ioctl() error\n");
 
 		sock_structs.sin_family = AF_INET;
@@ -477,9 +477,9 @@ void	Server::clean(void) {
 	std::cout << RED << "Stopping..." << RESET << std::endl;
 }
 
-std::vector<std::vector<std::string> >	Server::_getConfOfFile(const char *conf) {
-
-	std::ifstream							file(conf);
+std::vector<std::vector<std::string> >	Server::_getConfOfFile(std::string conf) 
+{
+	std::ifstream							file(conf.c_str());
 	std::string								line;
 	std::vector<std::vector<std::string> >	confFile;
 	std::vector<std::string>				tmp;
@@ -511,8 +511,8 @@ std::vector<std::vector<std::string> >	Server::_getConfOfFile(const char *conf) 
 	return confFile;
 }
 
-void	Server::_fileToServer(const char *conf_file) {
-
+void	Server::_fileToServer(std::string conf_file)
+{
 	std::vector<std::vector<std::string> >	confFile;
 
 	confFile = this->_getConfOfFile(conf_file);

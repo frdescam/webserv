@@ -19,8 +19,8 @@ class Response
 		std::string & getRawResponse(void);
 		std::map<int, std::string> & getErrorPages(void);
 		void	setErrorPages(std::map<int, std::string> new_errorPages);
-		void	createCgiGet(const char *filename);
-		void	createCgiPost(const char *filename, std::string const upload_path);
+		void	createCgiGet(std::string filename);
+		void	createCgiPost(std::string filename, std::string const upload_path);
 		void	createGet(std::string filename);
 		void	createContinue(void);
 		void	createRedirection(std::string redirection);
@@ -50,7 +50,7 @@ class Response
 
 		void		_settingMimes(void);
 		std::string	_getErrorMessage(std::string const & error_code);
-		void		_createCgi(const char *filename, std::string header);
+		void		_createCgi(std::string filename, std::string header);
 		std::string _getPathToError(std::string error_code);
 		void		_binary(std::string filename);
 		std::streampos		_lengthOfFile(std::ifstream & f);

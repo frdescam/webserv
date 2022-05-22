@@ -10,14 +10,14 @@ Response::Response(void): _header(""), _body(""), _raw_response(""), _filename("
 Response::~Response(void)
 {}
 
-Response::Response(const Response & other): _header(other._header), _body(other._body), _raw_response(other._raw_response), _filename(other._filename),
+Response::Response(const Response &other): _header(other._header), _body(other._body), _raw_response(other._raw_response), _filename(other._filename),
 	_sent_all(other._sent_all), _is_binary(other._is_binary), _length_sent(other._length_sent), _length_response(other._length_response)
 {
 	this->_errorPages = other._errorPages;
 	this->_mimes = other._mimes;
 }
 
-Response & Response::operator=(const Response & other)
+Response & Response::operator=(const Response &other)
 {
 	if (this != &other)
 	{
@@ -35,6 +35,7 @@ Response & Response::operator=(const Response & other)
 	return (*this);
 }
 
+// TODO use string.clear()
 void	Response::reset(void)
 {
 	this->_body = "";
@@ -51,7 +52,7 @@ std::string &	Response::getRawResponse(void) { return this->_raw_response; }
 bool			Response::isEverythingSent(void) { return this->_sent_all; }
 size_t			Response::getRemainingLength(void) { return this->_length_response - this->_length_sent; }
 size_t			Response::getLengthSent(void) {	return this->_length_sent; }
-std::map<int, std::string> & Response::getErrorPages(void) { return this->_errorPages; }
+std::map<int, std::string> &Response::getErrorPages(void) { return this->_errorPages; }
 
 void	Response::addToLengthSent(size_t block_size)
 {
@@ -70,10 +71,10 @@ void	Response::setErrorPages(std::map<int, std::string> new_errorPages)
 	this->_errorPages = new_errorPages;
 }
 
-void		Response::_createCgi(const char *filename, std::string begin_header)
+void		Response::_createCgi(std::string filename, std::string begin_header)
 {
 	this->_filename = std::string(filename);
-	std::ifstream		f(filename);
+	std::ifstream		f(filename.c_str());
 	std::stringstream	ss;
 	std::streampos		len_of_file;
 	std::string			str(""), body(""), header(begin_header);
@@ -147,10 +148,10 @@ void		Response::_createCgi(const char *filename, std::string begin_header)
 	*/
 }
 
-void	Response::createCgiPost(const char *filename, std::string const upload_path)
+void	Response::createCgiPost(std::string filename, std::string const upload_path)
 {
 	std::string		header;
-	std::ifstream	f(filename);
+	std::ifstream	f(filename.c_str());
 	std::stringstream buffer;
 	std::string 	uploaded_file(""), str("");
 
@@ -183,7 +184,7 @@ void	Response::createCgiPost(const char *filename, std::string const upload_path
 	this->_createCgi(filename, header);
 }
 
-void	Response::createCgiGet(const char *filename)
+void	Response::createCgiGet(std::string filename)
 {
 	std::string header = "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n";
 	this->_createCgi(filename, header);

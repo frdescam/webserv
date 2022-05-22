@@ -186,9 +186,9 @@ Response	Request::execute(void) {
 			Cgi c(this->_path_to_cgi, this->_post, this->_tmp_file, this->_env_vars);
 			c.execute();
 			if (this->_post)
-				r.createCgiPost(std::string("cgi_" + this->_tmp_file).c_str(), this->_env_vars["UPLOAD_STORE"]);
+				r.createCgiPost("cgi_" + this->_tmp_file, this->_env_vars["UPLOAD_STORE"]);
 			else
-				r.createCgiGet(std::string("cgi_" + this->_tmp_file).c_str());
+				r.createCgiGet("cgi_" + this->_tmp_file);
 		}
 		else if (check_path(this->_env_vars["SCRIPT_FILENAME"]) == -1)
 			r.error("404");

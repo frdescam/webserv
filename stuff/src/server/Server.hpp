@@ -21,7 +21,7 @@ class Server
 		Server(const Server & other);
 		Server & operator=(const Server & other);
 
-		void	config(const char * conf_file);
+		void	config(std::string conf_file);
 		int		setup(void);
 		void	run(void);
 		void	clean(void);
@@ -36,7 +36,7 @@ class Server
 		std::map<int, Client>			_socket_clients;	// WORKS
 		std::map<int, Request *>		_fd_request_client; // WORKS
 
-		void				_fileToServer(const char *conf_file);
+		void				_fileToServer(std::string conf_file);
 		int					_listenPoll(void);
 		bool 				_checkingRevents(void);
 		bool				_pollin(std::vector<pollfd>::iterator it);
@@ -49,7 +49,7 @@ class Server
 		void				_verifyHost(std::string & host);
 		void				_getHostInBuffer(std::string buffer, std::string &host, std::string &uri);
 		void				_setClientPollFd(std::vector<pollfd>::iterator	it, int event);
-		std::vector<std::vector<std::string> >	_getConfOfFile(const char *conf);
+		std::vector<std::vector<std::string> >	_getConfOfFile(std::string conf);
 
 };
 
