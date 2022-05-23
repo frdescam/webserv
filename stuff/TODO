@@ -1,7 +1,7 @@
 general:
-	ft TODO, c_str, char, check useless funcs &| variables
-	check std::string init to "", ft ""
-	use string clear instead of = ""
+	try to use reference in request, not copying each str should make it faster, in addToBody and stuff
+	ft TODO, c_str, char, check useless funcs variables
+	check std::string init to "", ft "", use std::string()
 	format all nicely
 	change variable names
 	change srcs names and stuff
@@ -13,9 +13,6 @@ response:
 	./src/response/Response.cpp:186:	// TODO this most likely breaks if i send a .htmla file
 	./src/response/Response.cpp:216:	// TODO theres a better way to change the set the length of response size
 
-./src/request/Parser.cpp:46:// TODO is the reference useful here?
-./src/request/Request.cpp:5:// TODO stop init strings to "" not needed
-./src/request/Request.hpp:9://TODO algo???? rm dis
 ./src/request/Request.cpp:3:// TODO pretty sure theres variables that are not needed here!
 ./src/request/Request.cpp:6:// TODO replace body len with body.size()?
 ./src/request/Request.cpp:133:// TODO check each getter
@@ -23,6 +20,3 @@ response:
 
 cgi:
 	./src/cgi/Cgi.cpp:31:// TODO erase _path_to_cgi DIS*
-
-client:
-	./src/client/Client.cpp:62:// TODO check if this us used

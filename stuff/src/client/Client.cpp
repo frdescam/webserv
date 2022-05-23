@@ -8,7 +8,7 @@ Client::~Client(void)
 		delete this->_http_request;
 }
 
-Client::Client(Client const & other)
+Client::Client(Client const &other)
 {
 	*this = other;
 }
@@ -21,9 +21,10 @@ Client::Client(pollfd fd)
 	this->_http_request = 0;
 }
 
-Client & Client::operator=(Client const & other) {
-
-	if (this != &other) {
+Client & Client::operator=(Client const &other)
+{
+	if (this != &other)
+	{
 		this->_client_fd = other._client_fd;
 		this->_http_request = other._http_request;
 		this->_http_response = other._http_response;
@@ -35,7 +36,7 @@ Client & Client::operator=(Client const & other) {
 	return (*this);
 }
 
-void	Client::addToRequest(std::string str, int rc, Config & block)
+void	Client::addToRequest(std::string str, int rc, Config &block)
 {
 	if (this->_http_request != NULL)
 	{
@@ -51,22 +52,19 @@ void	Client::addToRequest(std::string str, int rc, Config & block)
 	this->_request_poll_fd.events = 0;
 }
 
-// do we use dis?
 void	Client::addToResponseLength(size_t block_size)
 {
 	this->_http_response.addToLengthSent(block_size);
 }
 
-Request			*Client::getRequestPtr(void) { return this->_http_request; }
-
-// TODO check if this us used
-void			Client::setId(int new_id) { this->_id = new_id; }
-int				Client::getId(void) { return this->_id; }
-int				Client::getRequestFd(void) { return this->_request_fd; }
-struct pollfd	Client::getRequestPollFd(void) { return this->_request_poll_fd; }
-struct pollfd	&Client::getClientPollFd(void) { return this->_client_fd; }
-Response		&Client::getResponse(void) { return this->_http_response; }
-void 			Client::setResponse(Response & r) { this->_http_response = r; }
+Request			*Client::getRequestPtr(void) {return this->_http_request;}
+void			Client::setId(int new_id) {this->_id = new_id;}
+//int				Client::getId(void) {return this->_id;}
+int				Client::getRequestFd(void) {return this->_request_fd;}
+struct pollfd	Client::getRequestPollFd(void) {return this->_request_poll_fd;}
+struct pollfd	&Client::getClientPollFd(void) {return this->_client_fd;}
+Response		&Client::getResponse(void) {return this->_http_response;}
+//void 			Client::setResponse(Response &r) {this->_http_response = r;}
 
 void			Client::resetRequest(void)
 {

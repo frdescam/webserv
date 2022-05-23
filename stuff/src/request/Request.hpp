@@ -6,8 +6,6 @@
 #include "../../inc/webserv.hpp"
 #include "../cgi/Cgi.hpp"
 #include "Parser.hpp"
-//TODO algo???? rm dis
-#include <algorithm>
 
 class Request
 {
@@ -64,9 +62,9 @@ class Request
 		void 		_initPostRequest(std::string request_str, int rc, int id);
 		void 		_addToLengthReceived(size_t length_to_add);
 		void		_checkLastBlock(void);
-		Response 	_executeGet(Response r);
-		Response 	_executePost(Response r);
-		Response 	_executeDelete(Response r);
+		Response	_executeGet(Response r);
+		Response	_executePost(Response r);
+		Response	_executeDelete(Response r);
 		Response	_executeRedirection(Response r);
 };
 

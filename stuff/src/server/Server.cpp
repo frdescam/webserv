@@ -180,7 +180,7 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 		host.append(uri);
 		this->_verifyHost(host);
 		std::string configName = this->_getRightConfigName(host);
-		if (configName == "")
+		if (configName.empty())
 		{
 			this->_closeConnection(it);
 			return (1);
@@ -413,8 +413,8 @@ void Server::_getHostInBuffer(std::string buffer, std::string &host, std::string
 	}
 }
 
-std::string Server::_getRightConfigName(std::string host) {
-
+std::string Server::_getRightConfigName(std::string host)
+{
 	std::string	ret;
 	size_t		found = 0;
 	std::string	ip;
@@ -428,22 +428,26 @@ std::string Server::_getRightConfigName(std::string host) {
 
 	//std::cout << ip << " " << uri << "\n";
 
-	for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++) {
+	for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
+	{
 		//std::cout << "ips " + it->first << "\n";
 		if (it->first.find(ip) != std::string::npos)
 			found++;
 	}
 	//std::cout << found << "\n";
-	if (found == 1)	// return the only one matching server{}
+	if (found == 1) // return the only one matching server{}
 		return (ip + "/1");
-	if (found > 1) {
-		while (found) {	// checks locations on each matching server{}
+	if (found > 1)
+	{
+		while (found) // checks locations on each matching server{}
+		{
 			std::stringstream	out;
 			Config				tmp;
 
 			out << found;
 			tmp = this->_config.at(ip + "/" + out.str());
-			for (std::map<std::string, Config>::iterator it = tmp.getLocation().begin(); it != tmp.getLocation().end(); it++) {
+			for (std::map<std::string, Config>::iterator it = tmp.getLocation().begin(); it != tmp.getLocation().end(); it++)
+			{
 				//std::cout << it->first << "\n";
 				if (it->first.compare(uri) == 0)
 					return (ip + "/" + out.str());
@@ -451,13 +455,17 @@ std::string Server::_getRightConfigName(std::string host) {
 			found--;
 		}
 	}
-	else {	// checks server_name on each maching server{} with port
+	else // checks server_name on each maching server{} with port
+	{
 		std::string port = ip.substr(ip.find(":") + 1, ip.find("/") - ip.find(":"));
 		//std::cout << "port " + port << "\n";
 		ip = ip.substr(0, ip.find(":"));
-		for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++) {
-			if (it->first.find(port) != it->first.npos) {
-				for (size_t i = 0; i < it->second.getServerNames().size(); i++) {
+		for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
+		{
+			if (it->first.find(port) != it->first.npos)
+			{
+				for (size_t i = 0; i < it->second.getServerNames().size(); i++)
+				{
 					//std::cout << "serverName " << it->second.getServerNames()[i] << "\n";
 					if (it->second.getServerNames()[i].compare(ip) == 0)
 						return it->first;
@@ -469,7 +477,8 @@ std::string Server::_getRightConfigName(std::string host) {
 	return ip + "/1";
 }
 
-void	Server::clean(void) {
+void	Server::clean(void)
+{
 	for (size_t i = 0; i < this->_pollfds.size(); i++)
 		close(this->_pollfds[i].fd);
 	this->_pollfds.clear();

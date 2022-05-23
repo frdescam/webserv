@@ -1,7 +1,7 @@
 #include "Request.hpp"
 
 Request::Request(void): _block(), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
- _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0), _body_part("")
+ _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
 }
@@ -57,8 +57,6 @@ Request::Request(std::string request_str, int rc, Config & block, int id): _bloc
 	_path_to_cgi("cgi/php-cgi"), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false), _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
-	//this->_body_part = "";
-	//std::string request_string(request_str);
 	this->_initEnvMap();
 	this->_env_vars["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env_vars["DOCUMENT_ROOT"] = _block.getRoot();
@@ -167,7 +165,7 @@ Response	Request::execute(void)
 	else if (this->_env_vars["REQUEST_URI"].find(".php") != std::string::npos
 		|| this->_env_vars["REQUEST_URI"].find("cgi") != std::string::npos)
 	{
-		if (this->_post && (!this->_env_vars["CONTENT_LENGTH"].compare("")
+		if (this->_post && (this->_env_vars["CONTENT_LENGTH"].empty()
 			|| !this->_env_vars["CONTENT_LENGTH"].compare("-1")))
 		{
 			r.error("411");

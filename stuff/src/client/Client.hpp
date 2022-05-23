@@ -8,20 +8,19 @@
 
 class Client
 {
-
 	public:
 		Client(void);
 		~Client(void);
 		Client(Client const &other);
 		Client(struct pollfd fd);
-		Client	&operator=(Client const & other);
+		Client	&operator=(Client const &other);
 
 		Response		&getResponse(void);
-		void 			setResponse(Response & r);
-		void			addToRequest(std::string str, int rc, Config & block);
+		//void 			setResponse(Response &r);
+		void			addToRequest(std::string str, int rc, Config &block);
 		void			addToResponseLength(size_t block_size);
 		void			setId(int new_id);
-		int 			getId(void);
+		//int			getId(void);
 		int				getRequestFd(void);
 		struct pollfd	getRequestPollFd(void);
 		struct pollfd	&getClientPollFd(void);

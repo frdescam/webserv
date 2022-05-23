@@ -43,9 +43,9 @@ class Parser
 		void 		_parseHttpAccept(std::string &output, std::string tofind);
 		void		_parseTransferEncoding(std::string & output);
 		void		_parseScript(std::string & request_uri);
-		void 		_addIndex();
+		void 		_addIndex(void);
 		void		_changeBlockToNewConfig(Config &newConfig);
-		void 		_chooseConfigBeforeExecution();
+		void 		_chooseConfigBeforeExecution(void);
 		std::string	_getLocationBeforeExecution(std::string path, Config &tmpBlock, Config &newConfig);
 };
 
