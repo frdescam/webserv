@@ -154,8 +154,6 @@ bool	Server::_sending(std::vector<pollfd>::iterator	it, std::map<int, Client>::i
 	return (0);
 }
 
-//TODO fix empty post request with file read function returned funny value
-
 int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::iterator client)
 {
 	int 			rc = -1;
@@ -203,7 +201,7 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 	return (0);
 }
 
-bool	Server::_pollin(std::vector<pollfd>::iterator	it)			// READING
+bool	Server::_pollin(std::vector<pollfd>::iterator it)			// READING
 {
 	std::map<int, Client>::iterator client;
 	std::vector<int>::iterator 		find;
@@ -390,7 +388,6 @@ int	Server::_listenPoll(void) {
 	return (0);
 }
 
-// TODO add while server run here isntead of main
 void	Server::run(void)
 {
 	while (!g_end)
@@ -405,10 +402,11 @@ void	Server::run(void)
 }
 
 // TODO is c_str her necessary?
-void Server::_getHostInBuffer(std::string buffer, std::string &host, std::string &uri) {
-
+void Server::_getHostInBuffer(std::string buffer, std::string &host, std::string &uri)
+{
 	std::vector<std::string> buff = mySplit(buffer, " \n\t\r");
-	for (std::vector<std::string>::iterator it = buff.begin(); it != buff.end(); it++) {
+	for (std::vector<std::string>::iterator it = buff.begin(); it != buff.end(); it++)
+	{
 		if (it->compare("GET") == 0)
 			uri = *(it + 1);
 		if (it->compare("Host:") == 0)

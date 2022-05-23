@@ -17,7 +17,7 @@ Request::~Request(void)
 		remove(("cgi_" + this->_tmp_file).c_str());
 }
 
-Request::Request(const Request & other): _block(other._block), _path_to_cgi(other._path_to_cgi),
+Request::Request(const Request &other): _block(other._block), _path_to_cgi(other._path_to_cgi),
 	_tmp_file(other._tmp_file), _completed(other._completed), _cgi(other._cgi), _chunked(other._chunked), _post(other._post), _header_completed(other._header_completed),
 	_sent_continue(other._sent_continue),  _last_chunk_received(other._last_chunk_received), _body_part_len(other._body_part_len), _length_body(other._length_body), _length_header(other._length_header), _length_received(other._length_received),
 	_length_of_chunk(other._length_of_chunk), _fd(other._fd), _flag(other._flag), _env_vars(other._env_vars)
@@ -27,7 +27,7 @@ Request::Request(const Request & other): _block(other._block), _path_to_cgi(othe
 		this->_body_part = other._body_part;
 }
 
-Request	&Request::operator=(const Request & other)
+Request	&Request::operator=(const Request &other)
 {
 	if (this != &other)
 	{
@@ -315,12 +315,11 @@ Response	Request::_executeRedirection(Response r)
 }
 
 // TODO stop using chars
-// USE iterators!
 void Request::addToBody(std::string request_str, int pos, int len)
 {
 	//std::cout << pos << " " << len << " " << "\n";
-	//std::cout << &request_str[pos] << "\n";
-	this->_body_part.append(&request_str[pos], &request_str[pos + len]);
+	this->_body_part.append(request_str, pos, len); 
+	//this->_body_part.append(&request_str[pos], &request_str[pos + len]);
 	this->_body_part_len += len;
 }
 

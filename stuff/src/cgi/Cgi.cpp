@@ -16,7 +16,7 @@ Cgi::Cgi(Cgi const & other):
 	_env_vars(other._env_vars)
 {}
 
-Cgi & Cgi::operator=(Cgi const & other)
+Cgi & Cgi::operator=(Cgi const &other)
 {
 	if (this != &other)
 	{
@@ -52,7 +52,7 @@ void	Cgi::execute(void)
 	c_pid = fork();
 	if (c_pid == 0)
 	{
-		fo = fopen(std::string("cgi_" + this->_infile).c_str(), "a");
+		fo = fopen(("cgi_" + this->_infile).c_str(), "a");
 		fdo = fileno(fo);
 		//close(2);
 		if (dup2(fdo, STDOUT_FILENO) == -1)

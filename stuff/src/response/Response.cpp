@@ -35,13 +35,12 @@ Response & Response::operator=(const Response &other)
 	return (*this);
 }
 
-// TODO use string.clear()
 void	Response::reset(void)
 {
-	this->_body = "";
-	this->_header = "";
-	this->_raw_response = "";
-	this->_filename = "";
+	this->_body.clear();
+	this->_header.clear();
+	this->_raw_response.clear();
+	this->_filename.clear();
 	this->_sent_all = false;
 	this->_is_binary = false;
 	this->_length_response = 0;
@@ -77,7 +76,7 @@ void		Response::_createCgi(std::string filename, std::string begin_header)
 	std::ifstream		f(filename.c_str());
 	std::stringstream	ss;
 	std::streampos		len_of_file;
-	std::string			str(""), body(""), header(begin_header);
+	std::string			str, body, header(begin_header);
 	bool				has_header = false;
 
 	//std::cout << filename << "\n";
@@ -120,40 +119,14 @@ void		Response::_createCgi(std::string filename, std::string begin_header)
 	this->_raw_response.append(header);
 	this->_raw_response.append(body);
 	this->setLengthResponseSizeT(this->_raw_response.size());
-	/*
-	f.close();
-	//std::cout << header + " " + begin_header <<"\n";
-	this->_body = body;
-	ss << this->_body.size();
-	header.append("Content-Length: ");
-	header.append(ss.str());
-	this->_header = header;
-	this->_header.append("\r\n\r\n");
-	this->_raw_response.append(this->_header);
-	this->_raw_response.append(this->_body);
-	//std::cout << header << "\n";
-	//std::cout << body  << "\n";
-	//std::cout << _raw_response << "\n";
-	this->setLengthResponseSizeT(this->_raw_response.size());
-	f.close();
-	this->_body = body;
-	ss << this->_body.size();
-	header.append("Content-Length: ");
-	header.append(ss.str());
-	this->_header = header;
-	this->_header.append("\r\n\r\n");
-	this->_raw_response.append(this->_header);
-	this->_raw_response.append(this->_body);
-	this->setLengthResponseSizeT(this->_raw_response.size());
-	*/
 }
 
 void	Response::createCgiPost(std::string filename, std::string const upload_path)
 {
-	std::string		header;
-	std::ifstream	f(filename.c_str());
-	std::stringstream buffer;
-	std::string 	uploaded_file(""), str("");
+	std::string			header;
+	std::ifstream		f(filename.c_str());
+	std::stringstream	buffer;
+	std::string 		uploaded_file, str;
 
 	f.clear();
 	f.seekg(0, std::ios::beg);
@@ -167,7 +140,7 @@ void	Response::createCgiPost(std::string filename, std::string const upload_path
 			std::size_t i = str.find("<br>") + 4;
 			if (i != std::string::npos)
 			{
-				std::size_t length = str.find(" ", i);
+				size_t	length = str.find(" ", i);
 				uploaded_file = str.substr(i, length - i);
 				header.append("Location: " + upload_path + "/" + uploaded_file + "\r\n");
 			}
@@ -197,18 +170,20 @@ void	Response::createContinue(void)
 	this->setLengthResponseSizeT(this->_raw_response.size());
 }
 
-std::streampos	Response::_lengthOfFile(std::ifstream & f)
+std::streampos	Response::_lengthOfFile(std::ifstream &f)
 {
-	std::streampos fsize = f.tellg();
+	std::streampos	fsize = f.tellg();
 	f.seekg(0, std::ios::end);
 	fsize = f.tellg() - fsize;
 	f.seekg(0, std::ios::beg);
 	return fsize;
 }
 
+// TODO change all to createCgi. stop using this->body & header
 void	Response::createGet(std::string filename)
 {
 	this->_filename = filename;
+	// TODO this most likely breaks if i send a .htmla file
 	if (filename.find(".html") == std::string::npos && filename.find(".txt") == std::string::npos)
 	{
 		this->_binary(filename);
@@ -231,14 +206,14 @@ void	Response::createGet(std::string filename)
 	else
 		return this->error("500");
 	f.close();
-
-	this->_body = body;
-	ss << this->_body.size();
+	//this->_body = body;
+	ss << body.size();
 	header.append(ss.str());
-	this->_header = header;
-	this->_header.append("\r\n\r\n");
-	this->_raw_response.append(this->_header);
-	this->_raw_response.append(this->_body);
+	//this->_header = header;
+	header.append("\r\n\r\n");
+	this->_raw_response.append(header);
+	this->_raw_response.append(body);
+	// TODO theres a better way to change the set the length of response size
 	this->setLengthResponseSizeT(this->_raw_response.size());
 	//std::cout << header << "\n";
 	//std::cout << body  << "\n";
@@ -286,14 +261,14 @@ void	Response::_binary(std::string filename)
 	ss << length;
 	header.append(ss.str());
 
-	this->_header = header;
-	this->_header.append("\r\n\r\n");
+	//this->_header = header;
+	header.append("\r\n\r\n");
 	this->_raw_response.append(this->_header);
 
-	std::string content((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
+	std::string	content((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
 	f.close();
-	this->_body = content;
-	this->_raw_response.append(this->_body);
+	//this->_body = content;
+	this->_raw_response.append(content);
 	this->setLengthResponseSizeT(this->_raw_response.size());
 }
 
