@@ -13,11 +13,11 @@ class Response
 	public:
 		Response(void);
 		~Response(void);
-		Response(const Response & other);
-		Response & operator=(const Response & other);
+		Response(const Response &other);
+		Response	&operator=(const Response &other);
 
-		std::string & getRawResponse(void);
-		std::map<int, std::string> & getErrorPages(void);
+		std::string	&getRawResponse(void);
+		std::map<int, std::string>	&getErrorPages(void);
 		void	setErrorPages(std::map<int, std::string> new_errorPages);
 		void	createCgiGet(std::string filename);
 		void	createCgiPost(std::string filename, std::string const upload_path);

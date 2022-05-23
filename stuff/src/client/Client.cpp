@@ -35,10 +35,8 @@ Client & Client::operator=(Client const & other) {
 	return (*this);
 }
 
-// TODO addToBody now with std::string!
 void	Client::addToRequest(std::string str, int rc, Config & block)
 {
-	//std::cout << str << "\n";
 	if (this->_http_request != NULL)
 	{
 		if (this->_http_request->isChunked())

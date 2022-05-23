@@ -1,9 +1,6 @@
 #include "Request.hpp"
 
-// TODO pretty sure theres variables that are not needed here!
-
-Request::Request(void): _block(), _path_to_cgi(""), _tmp_file(""),
- _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
+Request::Request(void): _block(), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
  _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0), _body_part("")
 {
 	this->_fp = NULL;
@@ -57,12 +54,10 @@ Request	&Request::operator=(const Request &other)
 }
 
 Request::Request(std::string request_str, int rc, Config & block, int id): _block(block),
-	_path_to_cgi("cgi/php-cgi"), _tmp_file(""),
-	_completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
-	_body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
+	_path_to_cgi("cgi/php-cgi"), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false), _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
-	this->_body_part = "";
+	//this->_body_part = "";
 	//std::string request_string(request_str);
 	this->_initEnvMap();
 	this->_env_vars["GATEWAY_INTERFACE"] = "CGI/1.1";
@@ -130,7 +125,6 @@ void	Request::_initPostRequest(std::string request_str, int rc, int id) {
 	this->_header_completed = true;
 }
 
-// TODO check each getter
 bool										Request::isComplete(void) { return this->_completed; }
 bool										Request::isChunked(void) { return this->_chunked; }
 bool										Request::isPost(void) { return this->_post; }
@@ -146,21 +140,20 @@ void										Request::setFpToNull(void) { this->_fp = NULL; }
 
 Response	Request::executeChunked(void)
 {
-	Response r;
+	Response	r;
 
 	r.createContinue();
 	this->_sent_continue = true;
 	return r;
 }
 
-Response	Request::execute(void) {
-
-	Response r;
+Response	Request::execute(void)
+{
+	Response	r;
 
 	r.setErrorPages(this->_block.getErrorPages());
-	if (!this->_block.getRedirection().first.empty()) {
+	if (!this->_block.getRedirection().first.empty())
 		return this->_executeRedirection(r);
-	}
 	if (this->_flag)
 	{
 		std::stringstream ss;
@@ -168,7 +161,6 @@ Response	Request::execute(void) {
 		r.error(ss.str());
 		return (r);
 	}
-
 	//std::cout << this->_env_vars["SCRIPT_NAME"] << "\n";
 	if (this->_env_vars["SERVER_PROTOCOL"].compare("HTTP/1.1"))
 		r.error("505");
@@ -199,12 +191,6 @@ Response	Request::execute(void) {
 	}
 	else
 	{
-		//Response (Request::*ptr [])(Response) = {&Request::_executeDelete, &Request::_executeGet, &Request::_executePost};
-		//std::string methods[] = {"DELETE", "GET", "POST", "0"};
-		//for(size_t i = 0; methods[i].compare("0"); i++)
-		//	if (!this->_env_vars["REQUEST_METHOD"].compare(methods[i]))
-		//		return (this->*ptr[i])(r);
-		//std::cout << _env_vars["REQUEST_METHOD"] << "\n";
 		if (!this->_env_vars["REQUEST_METHOD"].compare("GET"))
 			return (this->_executeGet(r));
 		else if (!this->_env_vars["REQUEST_METHOD"].compare("POST"))
@@ -216,11 +202,12 @@ Response	Request::execute(void) {
 	return (r);
 }
 
+// TODO check if delete works
 Response	Request::_executeDelete(Response r)
 {
-    int			res;
     std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
+    int			res;
 
 	if (!this->_block.getAlowMethods().empty() && std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "DELETE") == this->_block.getAlowMethods().end())
 	{
@@ -314,12 +301,10 @@ Response	Request::_executeRedirection(Response r)
 	return r;
 }
 
-// TODO stop using chars
-void Request::addToBody(std::string request_str, int pos, int len)
+void	Request::addToBody(std::string request_str, int pos, int len)
 {
 	//std::cout << pos << " " << len << " " << "\n";
 	this->_body_part.append(request_str, pos, len); 
-	//this->_body_part.append(&request_str[pos], &request_str[pos + len]);
 	this->_body_part_len += len;
 }
 
@@ -370,7 +355,7 @@ void Request::addToBodyChunked(std::string request_str, int len)
 {
 	if (len == 0)
 		return;
-	std::string 				hexa = "";
+	std::string 				hexa;
 	size_t 						begin = 0;
 	int							i = 0;
 

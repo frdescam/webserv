@@ -94,7 +94,7 @@ void	Server::_closeConnection(std::vector<pollfd>::iterator	it)
 	close(it->fd);
 	if (this->_socket_clients.find(it->fd) != this->_socket_clients.end())
 	{
-		if (this->_socket_clients.find(it->fd)->second.getRequestPtr() != 0)
+		if (this->_socket_clients.find(it->fd)->second.getRequestPtr() != NULL)
 		{
 			if (this->_socket_clients.find(it->fd)->second.getRequestPtr()->getFp() != NULL)
 			{
@@ -225,9 +225,9 @@ bool	Server::_pollin(std::vector<pollfd>::iterator it)			// READING
 			std::cout << "receiving: " << ret << "\n";
 			if (ret == 1)
 				return (1);
-			Request * ptr = client->second.getRequestPtr();
+			Request *ptr = client->second.getRequestPtr();
 			std::cout << "complete " << ptr->isComplete() << "\n";
-			if (ptr != 0 && (ptr->isComplete() || (ptr->isChunked() && !ptr->sentContinue())))
+			if (ptr != NULL && (ptr->isComplete() || (ptr->isChunked() && !ptr->sentContinue())))
 			{
 				//std::cout << "A\n";
 				it->events = POLLOUT;
