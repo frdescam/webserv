@@ -401,7 +401,6 @@ void	Server::run(void)
 	}
 }
 
-// TODO is c_str her necessary?
 void Server::_getHostInBuffer(std::string buffer, std::string &host, std::string &uri)
 {
 	std::vector<std::string> buff = mySplit(buffer, " \n\t\r");
