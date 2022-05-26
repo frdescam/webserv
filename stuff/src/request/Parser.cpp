@@ -45,7 +45,6 @@ size_t	Parser::getLengthHeader(void) {return this->_length_header;}
 Config	Parser::getBlock(void) {return this->_block;}
 int		Parser::getFlag(void) {return this->_flag;}
 
-// TODO is the reference useful here?
 std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output)
 {
 	size_t i = 0;
@@ -100,7 +99,7 @@ std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output
 
 void	Parser::_parseQueryString(std::string &request_uri)
 {
-	std::size_t i = 0;
+	std::size_t	i = 0;
 
 	if ((i = request_uri.find("?")) != std::string::npos)
 	{
@@ -112,14 +111,15 @@ void	Parser::_parseQueryString(std::string &request_uri)
 /*
 ** The REQUEST_METHOD meta-variable MUST be set to the method which should be used by the script to process the request
 */
+
 void	Parser::_parseRequestMethod(std::string &output, std::size_t &pos)
 {
 	std::size_t	i = 0;
-	std::string	methods[4] = {"GET", "POST", "DELETE", "0"};
+	std::string	methods[] = {"GET", "POST", "DELETE"};
 
-	while (methods[i].compare("0") != 0)
+	while (i < 3)
 	{
-		if (output.substr(0, methods[i].length()).compare(methods[i]) == 0)
+		if (output.substr(0, methods[i].length()).compare(methods[i]) == 0) 
 		{
 			this->_env_vars["REQUEST_METHOD"] = methods[i];
 			this->_method = methods[i];

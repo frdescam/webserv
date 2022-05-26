@@ -9,10 +9,10 @@ class Parser
 	public:
 		Parser(void);
 		~Parser(void);
-		Parser(Parser const & other);
-		Parser(std::map<std::string, std::string> & env_var, Config & block);
-		Parser & operator=(Parser const & other);
-		std::map<std::string, std::string> 	parseOutputClient(std::string & output);
+		Parser(Parser const &other);
+		Parser(std::map<std::string, std::string> &env_var, Config &block);
+		Parser & operator=(Parser const &other);
+		std::map<std::string, std::string>	parseOutputClient(std::string &output);
 		bool	isPost(void);
 		bool	isChunked(void);
 		size_t	getLengthBody(void);
@@ -30,7 +30,7 @@ class Parser
 		std::string							_method;
 		std::string							_content_length;
 		std::string							_content_type;
-		std::map<std::string, std::string>  _env_vars;
+		std::map<std::string, std::string>	_env_vars;
 		Config								_block;
 
 		void		_parseQueryString(std::string & request_uri);

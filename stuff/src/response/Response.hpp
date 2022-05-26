@@ -4,9 +4,6 @@
 # include "./../../inc/webserv.hpp"
 # include <dirent.h>
 
-/*
-** Response to Client's Request
-*/
 class Response
 {
 
@@ -18,22 +15,21 @@ class Response
 
 		std::string	&getRawResponse(void);
 		std::map<int, std::string>	&getErrorPages(void);
-		void	setErrorPages(std::map<int, std::string> new_errorPages);
-		void	createCgiGet(std::string filename);
-		void	createCgiPost(std::string filename, std::string const upload_path);
-		void	createGet(std::string filename);
+		void	setErrorPages(const std::map<int, std::string> &new_errorPages);
+		void	createCgiGet(const std::string &filename);
+		void	createCgiPost(const std::string &filename, const std::string &upload_path);
+		void	createGet(const std::string &filename);
 		void	createContinue(void);
-		void	createRedirection(std::string redirection);
-		void	createDelete(std::string filename);
-		void	printDirectory(std::string root_dir, std::string dir);
-		void	error(std::string const error_code);
+		void	createRedirection(const std::string &redirection);
+		void	createDelete(const std::string &filename);
+		void	printDirectory(const std::string &root_dir, const std::string &dir);
+		void	error(const std::string &error_code);
 		void	addToLengthSent(size_t block_size);
 		bool	isEverythingSent(void);
 		void	setLengthResponseSizeT(size_t len_of_string);
 		size_t	getRemainingLength(void);
 		size_t	getLengthSent(void);
 		void	reset(void);
-		bool	nextBit(void);
 
 	private:
 		std::string							_header;
@@ -48,12 +44,12 @@ class Response
 		std::map<int, std::string>			_errorPages;
 
 
-		void		_settingMimes(void);
-		std::string	_getErrorMessage(std::string const & error_code);
-		void		_createCgi(std::string filename, std::string header);
-		std::string _getPathToError(std::string error_code);
-		void		_binary(std::string filename);
-		std::streampos		_lengthOfFile(std::ifstream & f);
+		void			_settingMimes(void);
+		std::string		_getErrorMessage(const std::string &error_code);
+		void			_createCgi(const std::string &filename, const std::string &header);
+		std::string 	_getPathToError(const std::string &error_code);
+		void			_binary(const std::string &filename);
+		std::streampos	_lengthOfFile(std::ifstream &f);
 };
 
 #endif

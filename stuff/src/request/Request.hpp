@@ -13,16 +13,16 @@ class Request
 		Request(void);
 		~Request(void);
 		Request(const Request &other);
-		Request(std::string request_str, int rc, Config &block, int id);
+		Request(std::string &request_str, int rc, Config &block, int id);
 		Request	&operator=(const Request &other);
 
 		bool	isComplete(void);
-		bool	hasHeader(void);
+		//bool	hasHeader(void);
 		bool	isPost(void);
 		bool	isChunked(void);
 		bool	sentContinue(void);
-		void	addToBody(std::string request_str, int pos, int len);
-		void	addToBodyChunked(std::string request_str, int len);
+		void	addToBody(const std::string &request_str, int pos, int len);
+		void	addToBodyChunked(const std::string &request_str, int len);
 		int		getFd(void);
 		FILE	*getFp(void);
 		void	setFpToNull(void);
@@ -30,9 +30,9 @@ class Request
 
 		Response									executeChunked(void);
 		Response									execute(void);
-		std::map<std::string,std::string> const		&getEnvVars(void) const;
+		//std::map<std::string,std::string> const		&getEnvVars(void) const;
 		Config										&getConf(void);
-		void										setSentContinue(bool val);
+		//void										setSentContinue(bool val);
 		int											getFlag(void);
 
 
@@ -59,7 +59,7 @@ class Request
 		FILE				*				_fp;
 
 		void		_initEnvMap(void);
-		void 		_initPostRequest(std::string request_str, int rc, int id);
+		void 		_initPostRequest(const std::string &request_str, int rc, int id);
 		void 		_addToLengthReceived(size_t length_to_add);
 		void		_checkLastBlock(void);
 		Response	_executeGet(Response r);
