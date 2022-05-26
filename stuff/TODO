@@ -18,7 +18,6 @@ request:
 	./src/request/Request.cpp:6:// TODO replace body len with body.size()?
 	./src/request/Request.cpp:133:// TODO check each getter
 	./src/request/Request.cpp:219:// TODO check if delete works
-	// why ask for S_IWOTH (write perm on other users and not this user?)
 
 cgi:
 	./src/cgi/Cgi.cpp:31:// TODO erase _path_to_cgi DIS*

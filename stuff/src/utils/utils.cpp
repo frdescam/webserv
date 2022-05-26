@@ -54,7 +54,7 @@ int	check_read_rights(const std::string &path)
 
 	if (stat(path.c_str(), &buf) == -1)
 		return(-1);
-	if (buf.st_mode & S_IROTH)
+	if (buf.st_mode & S_IRUSR)
 		return (1);
 	return (0);
 }
@@ -65,7 +65,7 @@ int	check_wright_rights(const std::string &path)
 
 	if (stat(path.c_str(), &buf) == -1)
 		return(-1);
-	if (buf.st_mode & S_IWOTH)
+	if (buf.st_mode & S_IWUSR)
 		return (1);
 	return (0);
 }
@@ -76,7 +76,7 @@ int	check_execute_rights(const std::string &path)
 
 	if (stat(path.c_str(), &buf) == -1)
 		return(-1);
-	if (buf.st_mode & S_IXOTH)
+	if (buf.st_mode & S_IXUSR)
 		return (1);
 	return (0);
 }

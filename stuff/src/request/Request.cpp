@@ -53,7 +53,7 @@ Request	&Request::operator=(const Request &other)
 	return (*this);
 }
 
-Request::Request(std::string request_str, int rc, Config & block, int id): _block(block),
+Request::Request(std::string &request_str, int rc, Config & block, int id): _block(block),
 	_path_to_cgi("cgi/php-cgi"), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false), _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
@@ -107,9 +107,8 @@ void	Request::_initEnvMap(void) {
 		this->_env_vars.insert(std::pair<std::string, std::string>(env_var[i], ""));
 }
 
-void	Request::_initPostRequest(std::string request_str, int rc, int id) {
-
-	std::stringstream ss;
+void	Request::_initPostRequest(const std::string &request_str, int rc, int id) {
+	std::stringstream	ss;
 
 	ss << id;
 	this->_tmp_file = "request_" + this->_env_vars["REQUEST_METHOD"] + "_" + ss.str();
@@ -126,11 +125,11 @@ void	Request::_initPostRequest(std::string request_str, int rc, int id) {
 bool										Request::isComplete(void) { return this->_completed; }
 bool										Request::isChunked(void) { return this->_chunked; }
 bool										Request::isPost(void) { return this->_post; }
-bool										Request::hasHeader(void) { return this->_header_completed; }
+//bool										Request::hasHeader(void) { return this->_header_completed; }
 bool										Request::sentContinue(void) { return this->_sent_continue; }
-std::map<std::string,std::string> const & 	Request::getEnvVars(void) const { return this->_env_vars; }
+//std::map<std::string,std::string> const & 	Request::getEnvVars(void) const { return this->_env_vars; }
 Config &									Request::getConf(void) { return this->_block; }
-void										Request::setSentContinue(bool val) { this->_sent_continue = val;}
+//void										Request::setSentContinue(bool val) { this->_sent_continue = val;}
 int											Request::getFd(void) { return this->_fd; }
 int											Request::getFlag(void) { return this->_flag; }
 FILE								*		Request::getFp(void) { return this->_fp; }
@@ -201,7 +200,7 @@ Response	Request::execute(void)
 }
 
 // TODO check if delete works
-Response	Request::_executeDelete(Response r)
+Response	Request::_executeDelete(Response &r)
 {
     std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
@@ -237,7 +236,7 @@ Response	Request::_executeDelete(Response r)
 	}
 	else
 	{
-		res = remove(path.c_str());
+		//res = remove(path.c_str());
 		if (check_wright_rights(path))
 		{
 			res = remove(path.c_str());
@@ -251,7 +250,7 @@ Response	Request::_executeDelete(Response r)
 	return (r);
 }
 
-Response	Request::_executeGet(Response r)
+Response	Request::_executeGet(Response &r)
 {
 	std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
@@ -280,7 +279,7 @@ Response	Request::_executeGet(Response r)
 	return (r);
 }
 
-Response	Request::_executePost(Response r)
+Response	Request::_executePost(Response &r)
 {
 	if (!this->_block.getAlowMethods().empty() &&
 			std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "POST") == this->_block.getAlowMethods().end())
@@ -292,7 +291,7 @@ Response	Request::_executePost(Response r)
 	return(r);
 }
 
-Response	Request::_executeRedirection(Response r)
+Response	Request::_executeRedirection(Response &r)
 {
 	if (this->_block.getRedirection().first.compare("301") == 0)
 		r.createRedirection(this->_block.getRedirection().second);
@@ -301,7 +300,7 @@ Response	Request::_executeRedirection(Response r)
 	return r;
 }
 
-void	Request::addToBody(std::string request_str, int pos, int len)
+void	Request::addToBody(const std::string &request_str, int pos, int len)
 {
 	//std::cout << pos << " " << len << " " << "\n";
 	this->_body_part.append(request_str, pos, len); 
@@ -351,7 +350,7 @@ void	Request::_addToLengthReceived(size_t length_to_add)
 		this->_completed = true;
 }
 
-void Request::addToBodyChunked(std::string request_str, int len)
+void Request::addToBodyChunked(const std::string &request_str, int len)
 {
 	if (len == 0)
 		return;

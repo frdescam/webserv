@@ -30,7 +30,7 @@ class Request
 
 		Response									executeChunked(void);
 		Response									execute(void);
-		//std::map<std::string,std::string> const		&getEnvVars(void) const;
+		//std::map<std::string,std::string> const	&getEnvVars(void) const;
 		Config										&getConf(void);
 		//void										setSentContinue(bool val);
 		int											getFlag(void);
@@ -62,10 +62,10 @@ class Request
 		void 		_initPostRequest(const std::string &request_str, int rc, int id);
 		void 		_addToLengthReceived(size_t length_to_add);
 		void		_checkLastBlock(void);
-		Response	_executeGet(Response r);
-		Response	_executePost(Response r);
-		Response	_executeDelete(Response r);
-		Response	_executeRedirection(Response r);
+		Response	_executeGet(Response &r);
+		Response	_executePost(Response &r);
+		Response	_executeDelete(Response &r);
+		Response	_executeRedirection(Response &r);
 };
 
 #endif
