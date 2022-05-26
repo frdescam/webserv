@@ -45,7 +45,7 @@ void	Cgi::execute(void)
 		eenv_tab[i] = (char *)s[i].c_str();
 	}
 	eenv_tab[this->_env_vars.size()] = 0;
-	//_path_to_cgi = "/usr/bin/php-cgi";
+	_path_to_cgi = "/usr/bin/php-cgi";
 	stab[0] = (char *)(this->_path_to_cgi.c_str());
 	stab[1] = (char *)(this->_env_vars["SCRIPT_FILENAME"].c_str());
 	stab[2] = 0;

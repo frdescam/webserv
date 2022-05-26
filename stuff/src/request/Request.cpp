@@ -215,7 +215,8 @@ Response	Request::_executeDelete(Response r)
 	if (path[path.size() - 1] == '/')
 		path.erase(path.size() - 1);
 	ret_check_path = check_path(path);
-    if (ret_check_path == -1)
+	//std::cout << ret_check_path << "\n";
+	if (ret_check_path == -1)
 		r.error("404");
 	else if (ret_check_path == 4)
 	{
@@ -236,6 +237,7 @@ Response	Request::_executeDelete(Response r)
 	}
 	else
 	{
+		res = remove(path.c_str());
 		if (check_wright_rights(path))
 		{
 			res = remove(path.c_str());
