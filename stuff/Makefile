@@ -7,24 +7,24 @@ RM		=	rm -f
 CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 
 SRCS	=	srcs/webserv.cpp \
-			srcs/config/Config.cpp \
-			srcs/server/Server.cpp \
-			srcs/request/Request.cpp \
-			srcs/response/Response.cpp \
-			srcs/client/Client.cpp \
-			srcs/utils/utils.cpp \
-			srcs/cgi/Cgi.cpp \
-			srcs/request/Parser.cpp
+			srcs/config_handler.cpp \
+			srcs/server.cpp \
+			srcs/request.cpp \
+			srcs/response.cpp \
+			srcs/client.cpp \
+			srcs/utils.cpp \
+			srcs/cgi.cpp \
+			srcs/parsing.cpp
 
 
-INCLUDES	=	inc/webserv.hpp \
-				srcs/config/Config.hpp \
-				srcs/server/Server.hpp \
-				srcs/request/Request.hpp \
-				srcs/response/Response.hpp \
-				srcs/client/Client.hpp \
-				srcs/cgi/Cgi.hpp \
-				srcs/request/Parser.hpp
+INCLUDES	=	srcs/webserv.hpp \
+				srcs/config_handler.hpp \
+				srcs/server.hpp \
+				srcs/request.hpp \
+				srcs/response.hpp \
+				srcs/client.hpp \
+				srcs/cgi.hpp \
+				srcs/parsing.hpp
 
 OBJS	=	${SRCS:.cpp=.o}
 

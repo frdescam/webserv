@@ -1,22 +1,22 @@
-#include "Response.hpp"
+#include "response.hpp"
 
-Response::Response(void): _sent_all(false), _is_binary(false),
+response::response(void): _sent_all(false), _is_binary(false),
 	_length_sent(0), _length_response(0)
 {
 	this->_settingMimes();
 }
 
-Response::~Response(void)
+response::~response(void)
 {}
 
-Response::Response(const Response &other): _header(other._header), _body(other._body), _raw_response(other._raw_response), _filename(other._filename),
+response::response(const response &other): _header(other._header), _body(other._body), _raw_response(other._raw_response), _filename(other._filename),
 	_sent_all(other._sent_all), _is_binary(other._is_binary), _length_sent(other._length_sent), _length_response(other._length_response)
 {
 	this->_errorPages = other._errorPages;
 	this->_mimes = other._mimes;
 }
 
-Response	&Response::operator=(const Response &other)
+response	&response::operator=(const response &other)
 {
 	if (this != &other)
 	{
@@ -34,7 +34,7 @@ Response	&Response::operator=(const Response &other)
 	return (*this);
 }
 
-void	Response::reset(void)
+void	response::reset(void)
 {
 	this->_header.clear();
 	this->_body.clear();
@@ -46,30 +46,30 @@ void	Response::reset(void)
 	this->_length_sent = 0;
 }
 
-std::string					&Response::getRawResponse(void) {return this->_raw_response;}
-bool						Response::isEverythingSent(void) {return this->_sent_all;}
-size_t						Response::getRemainingLength(void) {return this->_length_response - this->_length_sent;}
-size_t						Response::getLengthSent(void) {return this->_length_sent;}
-std::map<int, std::string>	&Response::getErrorPages(void) {return this->_errorPages;}
+std::string					&response::getRawresponse(void) {return this->_raw_response;}
+bool						response::isEverythingSent(void) {return this->_sent_all;}
+size_t						response::getRemainingLength(void) {return this->_length_response - this->_length_sent;}
+size_t						response::getLengthSent(void) {return this->_length_sent;}
+std::map<int, std::string>	&response::getErrorPages(void) {return this->_errorPages;}
 
-void	Response::addToLengthSent(size_t block_size)
+void	response::addToLengthSent(size_t block_size)
 {
 	this->_length_sent += block_size;
 	if (this->_length_sent == this->_length_response)
 		this->_sent_all = true;
 }
 
-void	Response::setLengthResponseSizeT(size_t len_of_string)
+void	response::setLengthresponseSizeT(size_t len_of_string)
 {
 	this->_length_response = len_of_string;
 }
 
-void	Response::setErrorPages(const std::map<int, std::string> &new_errorPages)
+void	response::setErrorPages(const std::map<int, std::string> &new_errorPages)
 {
 	this->_errorPages = new_errorPages;
 }
 
-void	Response::_createCgi(const std::string &filename, const std::string &begin_header)
+void	response::_createcgi(const std::string &filename, const std::string &begin_header)
 {
 	std::ifstream		f(filename.c_str());
 	std::stringstream	ss;
@@ -109,10 +109,10 @@ void	Response::_createCgi(const std::string &filename, const std::string &begin_
 	header.append("\r\n\r\n");
 	this->_raw_response.append(header);
 	this->_raw_response.append(body);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-void	Response::createCgiPost(const std::string &filename, const std::string &upload_path)
+void	response::createcgiPost(const std::string &filename, const std::string &upload_path)
 {
 	std::string			header;
 	std::ifstream		f(filename.c_str());
@@ -145,23 +145,23 @@ void	Response::createCgiPost(const std::string &filename, const std::string &upl
 		return this->error("500");
 	}
 	f.close();
-	this->_createCgi(filename, header);
+	this->_createcgi(filename, header);
 }
 
-void	Response::createCgiGet(const std::string &filename)
+void	response::createcgiGet(const std::string &filename)
 {
 	std::string		header = "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n";
-	this->_createCgi(filename, header);
+	this->_createcgi(filename, header);
 }
 
-void	Response::createContinue(void)
+void	response::createContinue(void)
 {
 	std::string		header("HTTP/1.1 100 Continue\r\n\r\n");
 	this->_raw_response = header;
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-std::streampos	Response::_lengthOfFile(std::ifstream &f)
+std::streampos	response::_lengthOfFile(std::ifstream &f)
 {
 	std::streampos	fsize = f.tellg();
 	f.seekg(0, std::ios::end);
@@ -170,7 +170,7 @@ std::streampos	Response::_lengthOfFile(std::ifstream &f)
 	return fsize;
 }
 
-void	Response::createGet(const std::string &filename)
+void	response::createGet(const std::string &filename)
 {
 	this->_filename = filename;
 	if ((filename.size() <= 5 || filename.compare(filename.size() - 5, 5, ".html") != 0) && (filename.size() <= 4 || filename.compare(filename.size() - 4, 4, ".txt") != 0))
@@ -199,20 +199,20 @@ void	Response::createGet(const std::string &filename)
 	header.append("\r\n\r\n");
 	this->_raw_response.append(header);
 	this->_raw_response.append(body);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-void	Response::createRedirection(const std::string &redirection)
+void	response::createRedirection(const std::string &redirection)
 {
 	std::string			header("HTTP/1.1 301 Moved Permanently\r\nLocation: " +
 		redirection + "\r\nConnection: keep-alive\r\nContent-Length: 0");
 
 	header.append("\r\n\r\n");
 	this->_raw_response.append(header);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-void	Response::_binary(const std::string &filename)
+void	response::_binary(const std::string &filename)
 {
 	std::size_t			found, length;
 	std::string			header, extension;
@@ -244,10 +244,10 @@ void	Response::_binary(const std::string &filename)
 	std::string	content((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
 	f.close();
 	this->_raw_response.append(content);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-void	Response::_settingMimes(void)
+void	response::_settingMimes(void)
 {
 	this->_mimes[".avi"] = "video/x-msvideo";
 	this->_mimes[".bmp"] = "image/bmp";
@@ -271,22 +271,22 @@ void	Response::_settingMimes(void)
 	this->_mimes[".*"] = "application/octet-stream";
 }
 
-std::string	Response::_getErrorMessage(const std::string &error_code)
+std::string	response::_getErrorMessage(const std::string &error_code)
 {
 	std::map<std::string, std::string> error_map;
-	error_map["400"] = "Bad Request";
+	error_map["400"] = "Bad request";
 	error_map["403"] = "Forbidden";
 	error_map["404"] = "Not Found";
 	error_map["405"] = "Method Not Allowed";
 	error_map["413"] = "Payload too large";
-	error_map["500"] = "Internal Server Error";
+	error_map["500"] = "Internal server Error";
 	error_map["200"] = "OK";
 	error_map["201"] = "Created";
 	error_map["409"] = "Conflict";
 	return (error_map[error_code]);
 }
 
-void	Response::error(const std::string &error_code)
+void	response::error(const std::string &error_code)
 {
 	std::string			error_page(this->_getPathToError(error_code)), error_message(this->_getErrorMessage(error_code));
 	std::ifstream		f(error_page.c_str());
@@ -316,10 +316,10 @@ void	Response::error(const std::string &error_code)
 	header.append("\r\n\r\n");
 	this->_raw_response.append(header);
 	this->_raw_response.append(body);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-void	Response::printDirectory(const std::string &root_dir, const std::string &dir)
+void	response::printDirectory(const std::string &root_dir, const std::string &dir)
 {
 	DIR					*dpdf;
 	struct dirent		*epdf;
@@ -356,10 +356,10 @@ void	Response::printDirectory(const std::string &root_dir, const std::string &di
 	header.append("\r\n\r\n");
 	this->_raw_response.append(header);
 	this->_raw_response.append(body);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-void	Response::createDelete(const std::string &filename)
+void	response::createDelete(const std::string &filename)
 {
 	std::stringstream	ss;
 	std::string			header("HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n");
@@ -374,10 +374,10 @@ void	Response::createDelete(const std::string &filename)
 	header.append("\r\n\r\n");
 	this->_raw_response.append(header);
 	this->_raw_response.append(body);
-	this->setLengthResponseSizeT(this->_raw_response.size());
+	this->setLengthresponseSizeT(this->_raw_response.size());
 }
 
-std::string Response::_getPathToError(const std::string &error_code)
+std::string response::_getPathToError(const std::string &error_code)
 {
 	std::string	path;
 

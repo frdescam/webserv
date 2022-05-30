@@ -1,4 +1,4 @@
-# include "./../../inc/webserv.hpp"
+# include "webserv.hpp"
 
 std::vector<std::string> mySplit(std::string &str, std::string charset)
 {

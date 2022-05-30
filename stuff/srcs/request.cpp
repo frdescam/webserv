@@ -1,12 +1,12 @@
-#include "Request.hpp"
+#include "request.hpp"
 
-Request::Request(void): _block(), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
+request::request(void): _block(), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false),
  _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
 }
 
-Request::~Request(void)
+request::~request(void)
 {
 	if (this->_post)
 		remove(this->_tmp_file.c_str());
@@ -14,7 +14,7 @@ Request::~Request(void)
 		remove(("cgi_" + this->_tmp_file).c_str());
 }
 
-Request::Request(const Request &other): _block(other._block), _path_to_cgi(other._path_to_cgi),
+request::request(const request &other): _block(other._block), _path_to_cgi(other._path_to_cgi),
 	_tmp_file(other._tmp_file), _completed(other._completed), _cgi(other._cgi), _chunked(other._chunked), _post(other._post), _header_completed(other._header_completed),
 	_sent_continue(other._sent_continue),  _last_chunk_received(other._last_chunk_received), _body_part_len(other._body_part_len), _length_body(other._length_body), _length_header(other._length_header), _length_received(other._length_received),
 	_length_of_chunk(other._length_of_chunk), _fd(other._fd), _flag(other._flag), _env_vars(other._env_vars)
@@ -24,7 +24,7 @@ Request::Request(const Request &other): _block(other._block), _path_to_cgi(other
 		this->_body_part = other._body_part;
 }
 
-Request	&Request::operator=(const Request &other)
+request	&request::operator=(const request &other)
 {
 	if (this != &other)
 	{
@@ -53,25 +53,25 @@ Request	&Request::operator=(const Request &other)
 	return (*this);
 }
 
-Request::Request(std::string &request_str, int rc, Config & block, int id): _block(block),
+request::request(std::string &request_str, int rc, config_handler & block, int id): _block(block),
 	_path_to_cgi("cgi/php-cgi"), _completed(false), _cgi(false), _chunked(false), _post(false), _header_completed(false), _sent_continue(false), _last_chunk_received(false), _body_part_len(0), _length_body(0), _length_header(0), _length_received(0), _length_of_chunk(0), _fd(-1), _flag(0)
 {
 	this->_fp = NULL;
 	this->_initEnvMap();
 	this->_env_vars["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env_vars["DOCUMENT_ROOT"] = _block.getRoot();
-	this->_env_vars["SERVER_NAME"] = _block.getServerNames()[0];
+	this->_env_vars["SERVER_NAME"] = _block.getserverNames()[0];
 	this->_env_vars["SERVER_SOFTWARE"] = "webserv/1.0";
 
-	if (!this->_block.getCgiPass().empty())
-		this->_path_to_cgi = this->_block.getCgiPass();
+	if (!this->_block.getcgiPass().empty())
+		this->_path_to_cgi = this->_block.getcgiPass();
 	if (this->_block.getUploadFolder().empty())
 		this->_env_vars["UPLOAD_STORE"] = "uploads";
 	else
 		this->_env_vars["UPLOAD_STORE"] = this->_block.getUploadFolder();
 
-	Parser	parser(_env_vars, _block);
-	this->_env_vars = parser.parseOutputClient(request_str);
+	parsing	parser(_env_vars, _block);
+	this->_env_vars = parser.parseOutputclient(request_str);
 	this->_block = parser.getBlock();
 	this->_post = parser.isPost();
 	this->_flag = parser.getFlag();
@@ -79,12 +79,12 @@ Request::Request(std::string &request_str, int rc, Config & block, int id): _blo
 	this->_length_body = parser.getLengthBody();
 	this->_length_header = parser.getLengthHeader();
 	if (!this->_flag && this->_post)
-		this->_initPostRequest(request_str, rc, id);
+		this->_initPostrequest(request_str, rc, id);
 	else
 		this->_completed = true;
 }
 
-void	Request::_initEnvMap(void)
+void	request::_initEnvMap(void)
 {
 	std::string env_var[] = {
 		"REDIRECT_STATUS", "DOCUMENT_ROOT",
@@ -106,7 +106,7 @@ void	Request::_initEnvMap(void)
 		this->_env_vars.insert(std::pair<std::string, std::string>(env_var[i], ""));
 }
 
-void	Request::_initPostRequest(const std::string &request_str, int rc, int id)
+void	request::_initPostrequest(const std::string &request_str, int rc, int id)
 {
 	std::stringstream	ss;
 
@@ -122,28 +122,28 @@ void	Request::_initPostRequest(const std::string &request_str, int rc, int id)
 	this->_header_completed = true;
 }
 
-bool										Request::isComplete(void) { return this->_completed; }
-bool										Request::isChunked(void) { return this->_chunked; }
-bool										Request::isPost(void) { return this->_post; }
-bool										Request::sentContinue(void) { return this->_sent_continue; }
-Config										&Request::getConf(void) { return this->_block; }
-int											Request::getFd(void) { return this->_fd; }
-int											Request::getFlag(void) { return this->_flag; }
-FILE								*		Request::getFp(void) { return this->_fp; }
-void										Request::setFpToNull(void) { this->_fp = NULL; }
+bool										request::isComplete(void) { return this->_completed; }
+bool										request::isChunked(void) { return this->_chunked; }
+bool										request::isPost(void) { return this->_post; }
+bool										request::sentContinue(void) { return this->_sent_continue; }
+config_handler										&request::getConf(void) { return this->_block; }
+int											request::getFd(void) { return this->_fd; }
+int											request::getFlag(void) { return this->_flag; }
+FILE								*		request::getFp(void) { return this->_fp; }
+void										request::setFpToNull(void) { this->_fp = NULL; }
 
-Response	Request::executeChunked(void)
+response	request::executeChunked(void)
 {
-	Response	r;
+	response	r;
 
 	r.createContinue();
 	this->_sent_continue = true;
 	return r;
 }
 
-Response	Request::execute(void)
+response	request::execute(void)
 {
-	Response	r;
+	response	r;
 
 	r.setErrorPages(this->_block.getErrorPages());
 	if (!this->_block.getRedirection().first.empty())
@@ -169,12 +169,12 @@ Response	Request::execute(void)
 		this->_cgi = true;
 		if (pathIsFile(this->_env_vars["SCRIPT_FILENAME"]) == 1)
 		{
-			Cgi c(this->_path_to_cgi, this->_post, this->_tmp_file, this->_env_vars);
+			cgi c(this->_path_to_cgi, this->_post, this->_tmp_file, this->_env_vars);
 			c.execute();
 			if (this->_post)
-				r.createCgiPost("cgi_" + this->_tmp_file, this->_env_vars["UPLOAD_STORE"]);
+				r.createcgiPost("cgi_" + this->_tmp_file, this->_env_vars["UPLOAD_STORE"]);
 			else
-				r.createCgiGet("cgi_" + this->_tmp_file);
+				r.createcgiGet("cgi_" + this->_tmp_file);
 		}
 		else if (check_path(this->_env_vars["SCRIPT_FILENAME"]) == -1)
 			r.error("404");
@@ -194,7 +194,7 @@ Response	Request::execute(void)
 	return (r);
 }
 
-Response	Request::_executeDelete(Response &r)
+response	request::_executeDelete(response &r)
 {
 	std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
@@ -242,7 +242,7 @@ Response	Request::_executeDelete(Response &r)
 	return (r);
 }
 
-Response	Request::_executeGet(Response &r)
+response	request::_executeGet(response &r)
 {
 	std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
@@ -270,7 +270,7 @@ Response	Request::_executeGet(Response &r)
 	return (r);
 }
 
-Response	Request::_executePost(Response &r)
+response	request::_executePost(response &r)
 {
 	if (!this->_block.getAlowMethods().empty() &&
 			std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "POST") == this->_block.getAlowMethods().end())
@@ -282,7 +282,7 @@ Response	Request::_executePost(Response &r)
 	return(r);
 }
 
-Response	Request::_executeRedirection(Response &r)
+response	request::_executeRedirection(response &r)
 {
 	if (this->_block.getRedirection().first.compare("301") == 0)
 		r.createRedirection(this->_block.getRedirection().second);
@@ -291,13 +291,13 @@ Response	Request::_executeRedirection(Response &r)
 	return r;
 }
 
-void	Request::addToBody(const std::string &request_str, int pos, int len)
+void	request::addToBody(const std::string &request_str, int pos, int len)
 {
 	this->_body_part.append(request_str, pos, len); 
 	this->_body_part_len += len;
 }
 
-int	Request::writeInFile(void)
+int	request::writeInFile(void)
 {
 	int	i = 0;
 
@@ -322,7 +322,7 @@ int	Request::writeInFile(void)
 	return (i);
 }
 
-void	Request::_checkLastBlock()
+void	request::_checkLastBlock()
 {
 	if (this->_last_chunk_received)
 	{
@@ -333,14 +333,14 @@ void	Request::_checkLastBlock()
 	}
 }
 
-void	Request::_addToLengthReceived(size_t length_to_add)
+void	request::_addToLengthReceived(size_t length_to_add)
 {
 	this->_length_received += length_to_add;
 	if (!this->_chunked && _length_received >= this->_length_body)
 		this->_completed = true;
 }
 
-void Request::addToBodyChunked(const std::string &request_str, int len)
+void request::addToBodyChunked(const std::string &request_str, int len)
 {
 	if (len == 0)
 		return;

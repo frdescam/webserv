@@ -1,20 +1,20 @@
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
-#include "../response/Response.hpp"
-#include "../config/Config.hpp"
-#include "../../inc/webserv.hpp"
-#include "../cgi/Cgi.hpp"
-#include "Parser.hpp"
+#include "config_handler.hpp"
+#include "cgi.hpp"
+#include "response.hpp"
+#include "parsing.hpp"
+#include "webserv.hpp"
 
-class Request
+class request
 {
 	public:
-		Request(void);
-		~Request(void);
-		Request(const Request &other);
-		Request(std::string &request_str, int rc, Config &block, int id);
-		Request	&operator=(const Request &other);
+		request(void);
+		~request(void);
+		request(const request &other);
+		request(std::string &request_str, int rc, config_handler &block, int id);
+		request	&operator=(const request &other);
 
 		bool	isComplete(void);
 		bool	isPost(void);
@@ -27,14 +27,14 @@ class Request
 		void	setFpToNull(void);
 		int		writeInFile(void);
 
-		Response									executeChunked(void);
-		Response									execute(void);
-		Config										&getConf(void);
+		response									executeChunked(void);
+		response									execute(void);
+		config_handler										&getConf(void);
 		int											getFlag(void);
 
 
 	private:
-		Config								_block;
+		config_handler								_block;
 		std::string							_path_to_cgi;
 		std::string							_tmp_file;
 		bool								_completed;
@@ -56,13 +56,13 @@ class Request
 		FILE				*				_fp;
 
 		void		_initEnvMap(void);
-		void 		_initPostRequest(const std::string &request_str, int rc, int id);
+		void 		_initPostrequest(const std::string &request_str, int rc, int id);
 		void 		_addToLengthReceived(size_t length_to_add);
 		void		_checkLastBlock(void);
-		Response	_executeGet(Response &r);
-		Response	_executePost(Response &r);
-		Response	_executeDelete(Response &r);
-		Response	_executeRedirection(Response &r);
+		response	_executeGet(response &r);
+		response	_executePost(response &r);
+		response	_executeDelete(response &r);
+		response	_executeRedirection(response &r);
 };
 
 #endif

@@ -1,25 +1,25 @@
-#include "Parser.hpp"
+#include "parsing.hpp"
 
-Parser::Parser(void): _post(false), _chunked(false), _flag(0), _length_body(0), _length_header(0),
+parsing::parsing(void): _post(false), _chunked(false), _flag(0), _length_body(0), _length_header(0),
 	_header(), _method(), _content_length(), _content_type()
 {}
 
-Parser::~Parser(void)
+parsing::~parsing(void)
 {}
 
-Parser::Parser(Parser const &other):
+parsing::parsing(parsing const &other):
 	_post(other._post), _chunked(other._chunked), _flag(other._flag), _length_body(other._length_body), _length_header(other._length_header),
 	_header(other._header), _method(other._method), _content_length(other._content_length), _content_type(other._content_type),
 	_env_vars(other._env_vars), _block(other._block)
 {}
 
-Parser::Parser(std::map<std::string, std::string> &env_vars, Config &block): _post(false), _chunked(false), _flag(0), _length_body(0), _length_header(0),
+parsing::parsing(std::map<std::string, std::string> &env_vars, config_handler &block): _post(false), _chunked(false), _flag(0), _length_body(0), _length_header(0),
 	_header(), _method(), _content_length(), _content_type(), _block(block)
 {
 	this->_env_vars = env_vars;
 }
 
-Parser& Parser::operator=(Parser const &other)
+parsing& parsing::operator=(parsing const &other)
 {
 	if (this != &other)
 	{
@@ -38,14 +38,14 @@ Parser& Parser::operator=(Parser const &other)
 	return *this;
 }
 
-bool	Parser::isPost(void) {return _post;}
-bool	Parser::isChunked(void) {return _chunked;}
-size_t	Parser::getLengthBody(void) {return this->_length_body;}
-size_t	Parser::getLengthHeader(void) {return this->_length_header;}
-Config	Parser::getBlock(void) {return this->_block;}
-int		Parser::getFlag(void) {return this->_flag;}
+bool	parsing::isPost(void) {return _post;}
+bool	parsing::isChunked(void) {return _chunked;}
+size_t	parsing::getLengthBody(void) {return this->_length_body;}
+size_t	parsing::getLengthHeader(void) {return this->_length_header;}
+config_handler	parsing::getBlock(void) {return this->_block;}
+int		parsing::getFlag(void) {return this->_flag;}
 
-std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output)
+std::map<std::string, std::string>	parsing::parseOutputclient(std::string &output)
 {
 	size_t i = 0;
 
@@ -60,10 +60,10 @@ std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output
 		this->_header = output;
 		this->_length_header = this->_header.size();
 	}
-	_parseRequestMethod(output, i);
-	_parseRequestUri(output, i);
-	_parseServerProtocol(output, i);
-	_parseServerPort(output, i);
+	_parserequestMethod(output, i);
+	_parserequestUri(output, i);
+	_parseserverProtocol(output, i);
+	_parseserverPort(output, i);
 	_parseTransferEncoding(output);
 	_parseContentType(output);
 	_parseHttpAccept(output, "Accept:");
@@ -89,11 +89,11 @@ std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output
 		this->_post = false;
 		this->_length_body = 0;
 	}
-	this->_chooseConfigBeforeExecution();
+	this->_chooseconfig_handlerBeforeExecution();
 	return this->_env_vars;
 }
 
-void	Parser::_parseQueryString(std::string &request_uri)
+void	parsing::_parseQueryString(std::string &request_uri)
 {
 	std::size_t	i = 0;
 
@@ -104,7 +104,7 @@ void	Parser::_parseQueryString(std::string &request_uri)
 	}
 }
 
-void	Parser::_parseRequestMethod(std::string &output, std::size_t &pos)
+void	parsing::_parserequestMethod(std::string &output, std::size_t &pos)
 {
 	std::size_t	i = 0;
 	std::string	methods[] = {"GET", "POST", "DELETE"};
@@ -122,7 +122,7 @@ void	Parser::_parseRequestMethod(std::string &output, std::size_t &pos)
 	}
 }
 
-void Parser::_parseRequestUri(std::string &output, std::size_t &pos) {
+void parsing::_parserequestUri(std::string &output, std::size_t &pos) {
 
 	std::size_t	i = 0, length_uri = 0;
 	std::string	request_uri;
@@ -141,7 +141,7 @@ void Parser::_parseRequestUri(std::string &output, std::size_t &pos) {
 		this->_env_vars["REQUEST_URI"].push_back('/');
 }
 
-void	Parser::_parseScript(std::string &request_uri)
+void	parsing::_parseScript(std::string &request_uri)
 {
 	std::size_t	i;
 	std::string	script;
@@ -158,7 +158,7 @@ void	Parser::_parseScript(std::string &request_uri)
 		this->_env_vars["SCRIPT_NAME"] = "";
 }
 
-void	Parser::_parseServerProtocol(std::string &output, std::size_t &pos)
+void	parsing::_parseserverProtocol(std::string &output, std::size_t &pos)
 {
 	std::size_t	i = 0, length_protocol = 0;
 	std::string	protocols[2] = {"HTTP", "0"};
@@ -179,7 +179,7 @@ void	Parser::_parseServerProtocol(std::string &output, std::size_t &pos)
 		this->_flag = 505;
 }
 
-void	Parser::_parseServerPort(std::string &output, std::size_t &pos)
+void	parsing::_parseserverPort(std::string &output, std::size_t &pos)
 {
 	std::size_t	i = 0, length_port = 0;
 
@@ -193,7 +193,7 @@ void	Parser::_parseServerPort(std::string &output, std::size_t &pos)
 	}
 }
 
-void	Parser::_parseContentLength(std::string &output)
+void	parsing::_parseContentLength(std::string &output)
 {
 	std::size_t	i = 0, length_content_length = 0;
 
@@ -212,11 +212,11 @@ void	Parser::_parseContentLength(std::string &output)
 			this->_flag = 411;
 	}
 	this->_env_vars["CONTENT_LENGTH"] = this->_content_length;
-	if (this->_length_body > this->_block.getClientMaxBodySize())
+	if (this->_length_body > this->_block.getclientMaxBodySize())
 		this->_flag = 413;
 }
 
-void	Parser::_parseContentType(std::string &output)
+void	parsing::_parseContentType(std::string &output)
 {
 	std::size_t	i = 0, length_content_type = 0;
 
@@ -232,7 +232,7 @@ void	Parser::_parseContentType(std::string &output)
 	this->_env_vars["CONTENT_TYPE"] = this->_content_type;
 }
 
-void	Parser::_parseHttpAccept(std::string &output, std::string tofind)
+void	parsing::_parseHttpAccept(std::string &output, std::string tofind)
 {
 	std::size_t	i = 0;
 	std::size_t	length = 0;
@@ -248,7 +248,7 @@ void	Parser::_parseHttpAccept(std::string &output, std::string tofind)
 	}
 }
 
-void	Parser::_parseTransferEncoding(std::string &output)
+void	parsing::_parseTransferEncoding(std::string &output)
 {
 	if (output.find("Transfer-Encoding: chunked") != std::string::npos)
 		this->_chunked = true;
@@ -256,10 +256,10 @@ void	Parser::_parseTransferEncoding(std::string &output)
 		this->_chunked = false;
 }
 
-void	Parser::_chooseConfigBeforeExecution(void)
+void	parsing::_chooseconfig_handlerBeforeExecution(void)
 {
 	std::string	path;
-	Config		tmpBlock = this->_block;
+	config_handler		tmpBlock = this->_block;
 
 	if (this->_env_vars["SCRIPT_NAME"].empty())
 		path = this->_env_vars["REQUEST_URI"];
@@ -267,28 +267,28 @@ void	Parser::_chooseConfigBeforeExecution(void)
 		path = this->_env_vars["REQUEST_URI"].substr(0, this->_env_vars["REQUEST_URI"].find_last_of("/") + 1);
 	while (!path.empty())
 	{
-		Config	newConfig;
-		path = this->_getLocationBeforeExecution(path, tmpBlock, newConfig);
+		config_handler	newconfig_handler;
+		path = this->_getLocationBeforeExecution(path, tmpBlock, newconfig_handler);
 	}
 	if (this->_env_vars["SCRIPT_NAME"].empty() && !this->_block.getAutoIndex() && this->_env_vars["REQUEST_METHOD"].compare("DELETE"))
 		this->_addIndex();
 }
 
-std::string	Parser::_getLocationBeforeExecution(std::string path, Config &tmpBlock, Config &newConfig)
+std::string	parsing::_getLocationBeforeExecution(std::string path, config_handler &tmpBlock, config_handler &newconfig_handler)
 {
-	std::map<std::string, Config>::iterator	iter;
+	std::map<std::string, config_handler>::iterator	iter;
 	std::string	tmp = path;
 	static bool	empty = false;
 
 	while (!tmp.empty())
 	{
-		for (std::map<std::string, Config>::iterator it = tmpBlock.getLocation().begin(); it != tmpBlock.getLocation().end(); it++)
+		for (std::map<std::string, config_handler>::iterator it = tmpBlock.getLocation().begin(); it != tmpBlock.getLocation().end(); it++)
 		{
 			if (it->first == tmp)
 			{
-				newConfig = it->second;
-				tmpBlock = newConfig;
-				this->_changeBlockToNewConfig(newConfig);
+				newconfig_handler = it->second;
+				tmpBlock = newconfig_handler;
+				this->_changeBlockToNewconfig_handler(newconfig_handler);
 				return path.substr(tmp.length(), path.length() - tmp.length());
 			}
 		}
@@ -302,32 +302,32 @@ std::string	Parser::_getLocationBeforeExecution(std::string path, Config &tmpBlo
 	return "";
 }
 
-void	Parser::_changeBlockToNewConfig(Config &newConfig)
+void	parsing::_changeBlockToNewconfig_handler(config_handler &newconfig_handler)
 {
-	if (!newConfig.getErrorPages().empty())
-		this->_block.getErrorPages() = newConfig.getErrorPages();
-	if (this->_block.getClientMaxBodySize() != newConfig.getClientMaxBodySize())
-		this->_block.getClientMaxBodySize() = newConfig.getClientMaxBodySize();
-	if (this->_block.getCgiPass() != newConfig.getCgiPass())
-		this->_block.getCgiPass() = newConfig.getCgiPass();
-	if (!newConfig.getAlowMethods().empty())
-		this->_block.getAlowMethods() = newConfig.getAlowMethods();
-	if (this->_block.getRoot() != newConfig.getRoot() && !newConfig.getRoot().empty())
+	if (!newconfig_handler.getErrorPages().empty())
+		this->_block.getErrorPages() = newconfig_handler.getErrorPages();
+	if (this->_block.getclientMaxBodySize() != newconfig_handler.getclientMaxBodySize())
+		this->_block.getclientMaxBodySize() = newconfig_handler.getclientMaxBodySize();
+	if (this->_block.getcgiPass() != newconfig_handler.getcgiPass())
+		this->_block.getcgiPass() = newconfig_handler.getcgiPass();
+	if (!newconfig_handler.getAlowMethods().empty())
+		this->_block.getAlowMethods() = newconfig_handler.getAlowMethods();
+	if (this->_block.getRoot() != newconfig_handler.getRoot() && !newconfig_handler.getRoot().empty())
 	{
-		this->_block.getRoot() = newConfig.getRoot();
+		this->_block.getRoot() = newconfig_handler.getRoot();
 		this->_env_vars["DOCUMENT_ROOT"] = this->_block.getRoot();
 	}
-	if (!newConfig.getIndex().empty())
-		this->_block.getIndex() = newConfig.getIndex();
-	if (newConfig.getAutoIndex() == true)
-		this->_block.getAutoIndex() = newConfig.getAutoIndex();
-	if (this->_block.getUploadFolder() != newConfig.getUploadFolder())
-		this->_block.getUploadFolder() = newConfig.getUploadFolder();
-	if (!newConfig.getRedirection().first.empty())
-		this->_block.getRedirection() = newConfig.getRedirection();
+	if (!newconfig_handler.getIndex().empty())
+		this->_block.getIndex() = newconfig_handler.getIndex();
+	if (newconfig_handler.getAutoIndex() == true)
+		this->_block.getAutoIndex() = newconfig_handler.getAutoIndex();
+	if (this->_block.getUploadFolder() != newconfig_handler.getUploadFolder())
+		this->_block.getUploadFolder() = newconfig_handler.getUploadFolder();
+	if (!newconfig_handler.getRedirection().first.empty())
+		this->_block.getRedirection() = newconfig_handler.getRedirection();
 }
 
-void	Parser::_addIndex(void)
+void	parsing::_addIndex(void)
 {
 	for (size_t i = 0; i < this->_block.getIndex().size(); i++)
 	{

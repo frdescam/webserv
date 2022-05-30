@@ -1,7 +1,0 @@
-general:
-	remove comments
-	format all nicely
-	change variable names
-	change srcs names and stuff
-	if config file is empty still wroks, change dis
-

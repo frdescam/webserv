@@ -1,19 +1,19 @@
-#include "Config.hpp"
+#include "config_handler.hpp"
 
-Config::Config(void): _ipAddress("127.0.0.1"), _port(8080), _serverNames(), _errorPages(), \
+config_handler::config_handler(void): _ipAddress("127.0.0.1"), _port(8080), _serverNames(), _errorPages(), \
 						_clientMaxBodySize(CLIENTMAXBODYSIZE), _cgiPass(), _allowMethods(), _location(), \
 						_root(), _index(), _autoIndex(false), _uploadFolder(), _redirection() {}
 
-Config::~Config(void) {}
+config_handler::~config_handler(void) {}
 
-Config::Config(Config const & other): _ipAddress(other._ipAddress), _port(other._port), \
+config_handler::config_handler(config_handler const & other): _ipAddress(other._ipAddress), _port(other._port), \
 										_serverNames(other._serverNames), _errorPages(other._errorPages), \
 										_clientMaxBodySize(other._clientMaxBodySize), _cgiPass(other._cgiPass), \
 										_allowMethods(other._allowMethods), _location(other._location), \
 										_root(other._root), _index(other._index), _autoIndex(other._autoIndex), \
 										_uploadFolder(other._uploadFolder), _redirection(other._redirection) {}
 
-Config & Config::operator=(Config const & other)
+config_handler & config_handler::operator=(config_handler const & other)
 {
 	if (this != &other)
 	{
@@ -36,72 +36,72 @@ Config & Config::operator=(Config const & other)
 
 // GET
 
-std::string							&Config::getIpAddress(void)
+std::string							&config_handler::getIpAddress(void)
 {
 	return this->_ipAddress;
 }
 
-int									&Config::getPort(void)
+int									&config_handler::getPort(void)
 {
 	return this->_port;
 }
 
-std::vector<std::string>			&Config::getServerNames(void)
+std::vector<std::string>			&config_handler::getserverNames(void)
 {
 	return this->_serverNames;
 }
 
-std::map<int, std::string>			&Config::getErrorPages(void)
+std::map<int, std::string>			&config_handler::getErrorPages(void)
 {
 	return this->_errorPages;
 }
 
-unsigned long long					&Config::getClientMaxBodySize(void)
+unsigned long long					&config_handler::getclientMaxBodySize(void)
 {
 	return this->_clientMaxBodySize;
 }
 
-std::string							&Config::getCgiPass(void)
+std::string							&config_handler::getcgiPass(void)
 {
 	return this->_cgiPass;
 }
 
-std::vector<std::string>			&Config::getAlowMethods(void)
+std::vector<std::string>			&config_handler::getAlowMethods(void)
 {
 	return this->_allowMethods;
 }
 
-std::map<std::string, Config>		&Config::getLocation(void)
+std::map<std::string, config_handler>		&config_handler::getLocation(void)
 {
 	return this->_location;
 }
 
-std::string							&Config::getRoot(void)
+std::string							&config_handler::getRoot(void)
 {
 	return this->_root;
 }
 
-std::vector<std::string>			&Config::getIndex(void)
+std::vector<std::string>			&config_handler::getIndex(void)
 {
 	return this->_index;
 }
 
-bool								&Config::getAutoIndex(void)
+bool								&config_handler::getAutoIndex(void)
 {
 	return this->_autoIndex;
 }
 
-std::string							&Config::getUploadFolder(void)
+std::string							&config_handler::getUploadFolder(void)
 {
 	return this->_uploadFolder;
 }
 
-std::pair<std::string, std::string>	&Config::getRedirection(void)
+std::pair<std::string, std::string>	&config_handler::getRedirection(void)
 {
 	return this->_redirection;
 }
 
-int	Config::parseServer(std::vector<std::vector<std::string> > confFile, size_t i)
+int	config_handler::parseserver(std::vector<std::vector<std::string> > confFile, size_t i)
 {
 	for (i++; i < confFile.size(); i++)
 	{
@@ -112,13 +112,13 @@ int	Config::parseServer(std::vector<std::vector<std::string> > confFile, size_t 
 		if (confFile[i][0].compare("listen") == 0)
 			this->_setListen(confFile[i]);
 		if (confFile[i][0].compare("server_name") == 0)
-			this->_setServerName(confFile[i]);
+			this->_setserverName(confFile[i]);
 		if (confFile[i][0].compare("error_page") == 0)
 			this->_setErrorPage(confFile[i]);
 		if (confFile[i][0].compare("client_max_body_size") == 0)
-			this->_setClientMaxBodySize(confFile[i]);
+			this->_setclientMaxBodySize(confFile[i]);
 		if (confFile[i][0].compare("cgi_pass") == 0)
-			this->_setCgiPass(confFile[i]);
+			this->_setcgiPass(confFile[i]);
 		if (confFile[i][0].compare("allow_methods") == 0)
 			this->_setAllowMethods(confFile[i]);
 		if (confFile[i][0].compare("location") == 0)
@@ -137,7 +137,7 @@ int	Config::parseServer(std::vector<std::vector<std::string> > confFile, size_t 
 	throw std::runtime_error("Error: server{} not closed\n");
 }
 
-void Config::checkBlock(bool location)
+void config_handler::checkBlock(bool location)
 {
 	if (this->_ipAddress.compare("localhost") == 0)
 		this->_ipAddress = "127.0.0.1";
@@ -147,14 +147,14 @@ void Config::checkBlock(bool location)
 		this->_root = "./www";
 	if (!this->_location.empty())
 	{
-		for (std::map<std::string, Config>::iterator it = _location.begin(); it != _location.end(); it++)
+		for (std::map<std::string, config_handler>::iterator it = _location.begin(); it != _location.end(); it++)
 			it->second.checkBlock(true);
 	}
 }
 
 // SET
 
-void Config::_setListen(std::vector<std::string> line)
+void config_handler::_setListen(std::vector<std::string> line)
 {
 	size_t	cut;
 
@@ -182,7 +182,7 @@ void Config::_setListen(std::vector<std::string> line)
 	}
 }
 
-void Config::_setServerName(std::vector<std::string> line)
+void config_handler::_setserverName(std::vector<std::string> line)
 {
 	if (line.size() == 1)
 		throw std::runtime_error("Error: Bad server_name config\n");
@@ -190,7 +190,7 @@ void Config::_setServerName(std::vector<std::string> line)
 		this->_serverNames.push_back(line[i]);
 }
 
-void Config::_setErrorPage(std::vector<std::string> line)
+void config_handler::_setErrorPage(std::vector<std::string> line)
 {
 	if (line.size() < 3)
 		throw std::runtime_error("Error: Bad error_page config\n");
@@ -204,7 +204,7 @@ void Config::_setErrorPage(std::vector<std::string> line)
 		this->_errorPages.insert(std::pair<int, std::string>(atoi(line[i].c_str()), uri));
 }
 
-void Config::_setClientMaxBodySize(std::vector<std::string> line)
+void config_handler::_setclientMaxBodySize(std::vector<std::string> line)
 {
 	size_t	pos;
 
@@ -222,14 +222,14 @@ void Config::_setClientMaxBodySize(std::vector<std::string> line)
 		this->_clientMaxBodySize *= 1000000000;
 }
 
-void Config::_setCgiPass(std::vector<std::string> line)
+void config_handler::_setcgiPass(std::vector<std::string> line)
 {
 	if (line.size() != 2)
 		throw std::runtime_error("Error: Bad cgi_pass config\n");
 	this->_cgiPass = line[1].c_str();
 }
 
-void Config::_setAllowMethods(std::vector<std::string> line)
+void config_handler::_setAllowMethods(std::vector<std::string> line)
 {
 	if (line.size() == 1)
 		throw std::runtime_error("Error: Bad allow_methods config\n");
@@ -237,9 +237,9 @@ void Config::_setAllowMethods(std::vector<std::string> line)
 		this->_allowMethods.push_back(line[i]);
 }
 
-int Config::_setLocation(std::vector<std::vector<std::string> > confFile, size_t i)
+int config_handler::_setLocation(std::vector<std::vector<std::string> > confFile, size_t i)
 {
-	Config		location;
+	config_handler		location;
 
 	if (confFile[i].size() == 3)
 	{
@@ -260,7 +260,7 @@ int Config::_setLocation(std::vector<std::vector<std::string> > confFile, size_t
 	return i;
 }
 
-int	Config::_parseLocationDeep(std::vector<std::vector<std::string> > confFile, size_t i)
+int	config_handler::_parseLocationDeep(std::vector<std::vector<std::string> > confFile, size_t i)
 {
 	for (i++; i < confFile.size(); i++)
 	{
@@ -271,9 +271,9 @@ int	Config::_parseLocationDeep(std::vector<std::vector<std::string> > confFile, 
 		if (confFile[i][0].compare("error_page") == 0)
 			this->_setErrorPage(confFile[i]);
 		if (confFile[i][0].compare("client_max_body_size") == 0)
-			this->_setClientMaxBodySize(confFile[i]);
+			this->_setclientMaxBodySize(confFile[i]);
 		if (confFile[i][0].compare("cgi_pass") == 0)
-			this->_setCgiPass(confFile[i]);
+			this->_setcgiPass(confFile[i]);
 		if (confFile[i][0].compare("allow_methods") == 0)
 			this->_setAllowMethods(confFile[i]);
 		if (confFile[i][0].compare("location") == 0)
@@ -292,7 +292,7 @@ int	Config::_parseLocationDeep(std::vector<std::vector<std::string> > confFile, 
 	throw std::runtime_error("Error: location{} not closed\n");
 }
 
-void Config::_setRoot(std::vector<std::string> line)
+void config_handler::_setRoot(std::vector<std::string> line)
 {
 	if (line.size() != 2)
 		throw std::runtime_error("Error: Bad root config\n");
@@ -300,7 +300,7 @@ void Config::_setRoot(std::vector<std::string> line)
 	this->_removeLastSlashe(this->_root);
 }
 
-void Config::_setIndex(std::vector<std::string> line)
+void config_handler::_setIndex(std::vector<std::string> line)
 {
 	if (line.size() == 1)
 		throw std::runtime_error("Error: Bad index config\n");
@@ -308,7 +308,7 @@ void Config::_setIndex(std::vector<std::string> line)
 		this->_index.push_back(line[i]);
 }
 
-void Config::_setAutoIndex(std::vector<std::string> line)
+void config_handler::_setAutoIndex(std::vector<std::string> line)
 {
 	if (line.size() != 2)
 		throw std::runtime_error("Error: Bad autoindex config\n");
@@ -316,7 +316,7 @@ void Config::_setAutoIndex(std::vector<std::string> line)
 		this->_autoIndex = true;
 }
 
-void Config::_setUploadFolder(std::vector<std::string> line)
+void config_handler::_setUploadFolder(std::vector<std::string> line)
 {
 
 	if (line.size() != 2)
@@ -324,7 +324,7 @@ void Config::_setUploadFolder(std::vector<std::string> line)
 	this->_uploadFolder = line[1].c_str();
 }
 
-void Config::_setRedirection(std::vector<std::string> line)
+void config_handler::_setRedirection(std::vector<std::string> line)
 {
 	if (line.size() < 2 || line.size() > 3 || (line[1].compare("301") == 0 && line.size() != 3))
 		throw std::runtime_error("Error: Bad return config\n");
@@ -336,28 +336,28 @@ void Config::_setRedirection(std::vector<std::string> line)
 		this->_redirection.second = line[2];
 }
 
-void	Config::_removeLastSlashe(std::string &path)
+void	config_handler::_removeLastSlashe(std::string &path)
 {
 	if (path.find_last_of('/') == path.size() - 1 && path.size() != 1)
 		path.erase(path.size() - 1, 1);
 }
 
-std::ostream	&operator<<(std::ostream &out, Config &conf)
+std::ostream	&operator<<(std::ostream &out, config_handler &conf)
 {
 	out << "IP = " << conf.getIpAddress() << std::endl;
 	out << "Port = " << conf.getPort() << std::endl;
-	out << "ServerNames = ";
-	for (size_t i = 0; i < conf.getServerNames().size(); i++)
+	out << "serverNames = ";
+	for (size_t i = 0; i < conf.getserverNames().size(); i++)
 	{
-		out << conf.getServerNames()[i];
-		if (i != conf.getServerNames().size() - 1)
+		out << conf.getserverNames()[i];
+		if (i != conf.getserverNames().size() - 1)
 			out << " ";
 	}
 	out << std::endl;
 	for (std::map<int, std::string>::iterator it = conf.getErrorPages().begin(); it != conf.getErrorPages().end(); it++)
 		out << "Error = " << it->first << ": File = " << it->second << std::endl;
-	out << "ClientMaxBodySize = " << conf.getClientMaxBodySize() << std::endl;
-	out << "CgiPass = " << conf.getCgiPass() << std::endl;
+	out << "clientMaxBodySize = " << conf.getclientMaxBodySize() << std::endl;
+	out << "cgiPass = " << conf.getcgiPass() << std::endl;
 	out << "AlowMethods = ";
 	for (size_t i = 0; i < conf.getAlowMethods().size(); i++)
 	{
@@ -366,7 +366,7 @@ std::ostream	&operator<<(std::ostream &out, Config &conf)
 			out << " ";
 	}
 	out << std::endl;
-	for (std::map<std::string, Config>::iterator it = conf.getLocation().begin(); it != conf.getLocation().end(); it++)
+	for (std::map<std::string, config_handler>::iterator it = conf.getLocation().begin(); it != conf.getLocation().end(); it++)
 		out << "Location " << it->first << " [\n" << it->second << "]" << std::endl;
 	out << "Root = " << conf.getRoot() << std::endl;
 	out << "Index = ";

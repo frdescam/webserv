@@ -1,22 +1,22 @@
-#include "Server.hpp"
+#include "server.hpp"
 
 extern bool g_end;
 
-Server::Server(void): _config(), _timeout(20 * 60 * 1000), _total_clients(0)
+server::server(void): _config(), _timeout(20 * 60 * 1000), _total_clients(0)
 {}
 
-Server::~Server(void)
+server::~server(void)
 {
 	for (size_t i = 0; i < this->_pollfds.size(); i++)
 		close(this->_pollfds[i].fd);
 	this->_pollfds.clear();
-	std::cout << RED << "Stopping..." << RESET << std::endl;
+	std::cout << RED << "Cleaning and exiting..." << RESET << std::endl;
 }
 
-Server::Server(const Server & other): _config(other._config), _timeout(other._timeout), _total_clients(other._total_clients)
+server::server(const server & other): _config(other._config), _timeout(other._timeout), _total_clients(other._total_clients)
 {}
 
-Server &Server::operator=(const Server &other)
+server &server::operator=(const server &other)
 {
 	if (this != &other)
 	{
@@ -30,7 +30,7 @@ Server &Server::operator=(const Server &other)
 	return (*this);
 }
 
-void Server::_verifyHost(std::string &host)
+void server::_verifyHost(std::string &host)
 {
 	if (host.find("localhost") != std::string::npos)
 		host.replace(0, 9, "127.0.0.1");
@@ -38,23 +38,23 @@ void Server::_verifyHost(std::string &host)
 		host.replace(0, 7, "127.0.0.1");
 }
 
-void	Server::config(std::string conf_file)
+void	server::config(std::string conf_file)
 {
 	if (conf_file.size() <= 5 || conf_file.compare(conf_file.size() - 5, 5, ".conf") != 0)
 		throw std::runtime_error("Error: Wrong file type\n");
 	if (pathIsFile(conf_file) != 1)
 		throw std::runtime_error("Error: File doens't exist or is incorrect\n");
-	this->_fileToServer(conf_file);
+	this->_fileToserver(conf_file);
 }
 
-int	Server::setup(void)
+int	server::setup(void)
 {
 	struct pollfd		listening_fd;
 	sockaddr_in			sock_structs;
 	int					server_fd, yes = 1;
 
 	this->_pollfds.reserve(CONNECTION_QUEUE);
-	for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
+	for(std::map<std::string, config_handler>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
 	{
 		size_t	pos = it->first.find("/");
 		if (it->first[pos + 1] != '1')
@@ -77,28 +77,28 @@ int	Server::setup(void)
 		listening_fd.fd = server_fd;
 		listening_fd.events = POLLIN;
 		this->_pollfds.push_back(listening_fd);
-		std::cout << "Listen on " << it->first.substr(0, pos) << std::endl;
+		std::cout << "Listening on: " << it->first.substr(0, pos) << std::endl;
 	}
-	std::cout << GREEN << "Starting..." << RESET << std::endl;
+	std::cout << GREEN << "Start..." << RESET << std::endl;
 	return (0);
 }
 
-void	Server::_closeConnection(std::vector<pollfd>::iterator it)
+void	server::_closeConnection(std::vector<pollfd>::iterator it)
 {
 	close(it->fd);
 	if (this->_socket_clients.find(it->fd) != this->_socket_clients.end())
 	{
-		if (this->_socket_clients.find(it->fd)->second.getRequestPtr() != NULL)
+		if (this->_socket_clients.find(it->fd)->second.getrequestPtr() != NULL)
 		{
-			if (this->_socket_clients.find(it->fd)->second.getRequestPtr()->getFp() != NULL)
-				fclose(this->_socket_clients.find(it->fd)->second.getRequestPtr()->getFp());
+			if (this->_socket_clients.find(it->fd)->second.getrequestPtr()->getFp() != NULL)
+				fclose(this->_socket_clients.find(it->fd)->second.getrequestPtr()->getFp());
 		}
 		this->_socket_clients.erase(it->fd);
 	}
 	this->_pollfds.erase(it);
 }
 
-bool	Server::_acceptConnections(int server_fd)
+bool	server::_acceptConnections(int server_fd)
 {
 	struct pollfd	client_fd;
 	int				new_socket = -1;
@@ -116,34 +116,34 @@ bool	Server::_acceptConnections(int server_fd)
 		client_fd.fd = new_socket;
 		client_fd.events = POLLIN;
 		this->_pollfds.insert(this->_pollfds.begin(), client_fd);
-		Client new_client(client_fd);
+		client new_client(client_fd);
 		new_client.setId(this->_total_clients++);
-		this->_socket_clients.insert(std::pair<int, Client>(client_fd.fd, new_client));
+		this->_socket_clients.insert(std::pair<int, client>(client_fd.fd, new_client));
 	}
 	while (new_socket != -1);
 	return (false);
 }
 
-bool	Server::_sending(std::vector<pollfd>::iterator	it, std::map<int, Client>::iterator client)
+bool	server::_sending(std::vector<pollfd>::iterator	it, std::map<int, client>::iterator client)
 {
 	int 		i = 0;
 	size_t 		block_size = BUFFER_SIZE;
 	std::string response_block;
 
-	if (BUFFER_SIZE > client->second.getResponse().getRemainingLength())
-		block_size = client->second.getResponse().getRemainingLength();
-	response_block = client->second.getResponse().getRawResponse().substr(client->second.getResponse().getLengthSent(), block_size);
+	if (BUFFER_SIZE > client->second.getresponse().getRemainingLength())
+		block_size = client->second.getresponse().getRemainingLength();
+	response_block = client->second.getresponse().getRawresponse().substr(client->second.getresponse().getLengthSent(), block_size);
 	i = send(it->fd, response_block.c_str(), block_size, MSG_NOSIGNAL);
 	if (i <= 0)
 	{
 		this->_closeConnection(it);
 		return (1);
 	}
-	client->second.addToResponseLength(block_size);
+	client->second.addToresponseLength(block_size);
 	return (0);
 }
 
-int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::iterator client)
+int	server::_receiving(std::vector<pollfd>::iterator it, std::map<int, client>::iterator client)
 {
 	int 			rc = -1;
 	std::string		buf(BUFFER_SIZE + 1, '\0');
@@ -154,10 +154,10 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 		this->_closeConnection(it);
 		return (1);
 	}
-	if (client->second.getRequestPtr() != NULL) // REQUEST ALREADY EXISTS
+	if (client->second.getrequestPtr() != NULL) // REQUEST ALREADY EXISTS
 	{
-		if (!client->second.getRequestPtr()->getFlag())
-			client->second.addToRequest(buf, rc, client->second.getRequestPtr()->getConf());
+		if (!client->second.getrequestPtr()->getFlag())
+			client->second.addTorequest(buf, rc, client->second.getrequestPtr()->getConf());
 	}
 	else // NEW REQUEST
 	{
@@ -167,29 +167,29 @@ int	Server::_receiving(std::vector<pollfd>::iterator it, std::map<int, Client>::
 		this->_getHostInBuffer(buf, host, uri);
 		host.append(uri);
 		this->_verifyHost(host);
-		std::string configName = this->_getRightConfigName(host);
+		std::string configName = this->_getRightconfig_handlerName(host);
 		if (configName.empty())
 		{
 			this->_closeConnection(it);
 			return (1);
 		}
-		client->second.addToRequest(buf, rc, _config.at(configName));
-		struct pollfd	client_request_pollfd = client->second.getRequestPollFd();
+		client->second.addTorequest(buf, rc, _config.at(configName));
+		struct pollfd	client_request_pollfd = client->second.getrequestPollFd();
 		if (client_request_pollfd.fd != -1) // IF POST
 		{
 			client_request_pollfd.events = POLLOUT;
 			this->_pollfds.push_back(client_request_pollfd);
 			this->_requests_fd.push_back(client_request_pollfd.fd);
-			this->_fd_request_client.insert(std::pair<int, Request *>(client_request_pollfd.fd, client->second.getRequestPtr()));
+			this->_fd_request_client.insert(std::pair<int, request *>(client_request_pollfd.fd, client->second.getrequestPtr()));
 			return (2);
 		}
 	}
 	return (0);
 }
 
-bool	Server::_pollin(std::vector<pollfd>::iterator it) // Reading socket 
+bool	server::_pollin(std::vector<pollfd>::iterator it) // Reading socket 
 {
-	std::map<int, Client>::iterator client;
+	std::map<int, client>::iterator client;
 	std::vector<int>::iterator 		find;
 	int								ret;
 
@@ -207,7 +207,7 @@ bool	Server::_pollin(std::vector<pollfd>::iterator it) // Reading socket
 			ret = this->_receiving(it, client);
 			if (ret == 1)
 				return (1);
-			Request *ptr = client->second.getRequestPtr();
+			request *ptr = client->second.getrequestPtr();
 			if (ptr != NULL && (ptr->isComplete() || (ptr->isChunked() && !ptr->sentContinue())))
 				it->events = POLLOUT;
 			if (ret == 2)
@@ -217,15 +217,15 @@ bool	Server::_pollin(std::vector<pollfd>::iterator it) // Reading socket
 	return (0);
 }
 
-void	Server::_setClientPollFd(std::vector<pollfd>::iterator it, int event)
+void	server::_setclientPollFd(std::vector<pollfd>::iterator it, int event)
 {
 	int	client_fd = -1;
 
-	for (std::map<int, Client>::iterator itb = this->_socket_clients.begin(); itb != this->_socket_clients.end(); itb++)
+	for (std::map<int, client>::iterator itb = this->_socket_clients.begin(); itb != this->_socket_clients.end(); itb++)
 	{
-		if (itb->second.getRequestPollFd().fd == it->fd)
+		if (itb->second.getrequestPollFd().fd == it->fd)
 		{
-			client_fd = itb->second.getClientPollFd().fd;
+			client_fd = itb->second.getclientPollFd().fd;
 			for (std::vector<pollfd>::iterator itpb = this->_pollfds.begin(); itpb != this->_pollfds.end(); itpb++)
 			{
 				if (itpb->fd == client_fd)
@@ -244,38 +244,38 @@ void	Server::_setClientPollFd(std::vector<pollfd>::iterator it, int event)
 	}
 }
 
-bool	Server::_pollout(std::vector<pollfd>::iterator it) // Write socket
+bool	server::_pollout(std::vector<pollfd>::iterator it) // Write socket
 {
-	std::map<int, Client>::iterator		client;
-	std::map<int, Request *>::iterator	request;
+	std::map<int, client>::iterator		client;
+	std::map<int, request *>::iterator	Request;
 	std::vector<int>::iterator			find;
 	int									ret = 0;
 
 	client = this->_socket_clients.find(it->fd);
 	if (client != this->_socket_clients.end()) // Socket of client
 	{
-		Request	*client_request = client->second.getRequestPtr();
-		if (client->second.getResponse().getRemainingLength() == 0) // Nothing sent yet 
+		request	*client_request = client->second.getrequestPtr();
+		if (client->second.getresponse().getRemainingLength() == 0) // Nothing sent yet 
 		{
 			if (client_request->isChunked() && !client_request->sentContinue())
-				client->second.getResponse() = client_request->executeChunked();
+				client->second.getresponse() = client_request->executeChunked();
 			else
-				client->second.getResponse() = client_request->execute();
+				client->second.getresponse() = client_request->execute();
 		}
 		if (this->_sending(it, client)) // Part of response sent 
 			return (1);
-		if (client->second.getResponse().isEverythingSent()) // All sent 
+		if (client->second.getresponse().isEverythingSent()) // All sent 
 		{
 			it->events = POLLIN; // Now reading the socket
-			client->second.getResponse().reset();
+			client->second.getresponse().reset();
 			if (client_request->getFlag() == 413)
 				return (1);
 			if (client_request->isComplete()) // Reset if not chunk (cos sending 100-Continue)
 			{
-				find = std::find(this->_requests_fd.begin(), this->_requests_fd.end(), client->second.getRequestFd());
+				find = std::find(this->_requests_fd.begin(), this->_requests_fd.end(), client->second.getrequestFd());
 				if (find != this->_requests_fd.end())
 				{
-					this->_fd_request_client.erase(client->second.getRequestFd());  // Erasing of element request in map & vector (fd)
+					this->_fd_request_client.erase(client->second.getrequestFd());  // Erasing of element request in map & vector (fd)
 					this->_requests_fd.erase(find);
 				}
 			}
@@ -285,21 +285,21 @@ bool	Server::_pollout(std::vector<pollfd>::iterator it) // Write socket
 	find = std::find(this->_requests_fd.begin(), this->_requests_fd.end(), it->fd);
 	if (find != this->_requests_fd.end()) // Fd (request)
 	{
-		request = this->_fd_request_client.find(it->fd);
-		ret = request->second->writeInFile();
+		Request = this->_fd_request_client.find(it->fd);
+		ret = Request->second->writeInFile();
 		if (ret <= 0)
 		{
-			_setClientPollFd(it, 0);
+			_setclientPollFd(it, 0);
 			return (1);
 		}
-		else if (request->second->isComplete())
+		else if (Request->second->isComplete())
 		{
-			if (request->second->getFp() != NULL)
+			if (Request->second->getFp() != NULL)
 			{
-				fclose(request->second->getFp());
-				request->second->setFpToNull();
+				fclose(Request->second->getFp());
+				Request->second->setFpToNull();
 			}
-			_setClientPollFd(it, 1);
+			_setclientPollFd(it, 1);
 			this->_pollfds.erase(it);
 			return (1);
 		}
@@ -307,7 +307,7 @@ bool	Server::_pollout(std::vector<pollfd>::iterator it) // Write socket
 	return (0);
 }
 
-bool	Server::_checkingRevents(void)
+bool	server::_checkingRevents(void)
 {
 	for (std::vector<pollfd>::iterator	it = this->_pollfds.begin(); it != this->_pollfds.end(); it++)
 	{
@@ -329,7 +329,7 @@ bool	Server::_checkingRevents(void)
 	return (g_end);
 }
 
-int		Server::_listenPoll(void)
+int		server::_listenPoll(void)
 {
 	int				rc = 0;
 	unsigned int 	size_vec = (unsigned int)this->_pollfds.size();
@@ -340,7 +340,7 @@ int		Server::_listenPoll(void)
 	return (0);
 }
 
-void	Server::run(void)
+void	server::run(void)
 {
 	while (!g_end)
 	{
@@ -353,7 +353,7 @@ void	Server::run(void)
 	}
 }
 
-void Server::_getHostInBuffer(std::string &buffer, std::string &host, std::string &uri)
+void server::_getHostInBuffer(std::string &buffer, std::string &host, std::string &uri)
 {
 	std::vector<std::string> buff = mySplit(buffer, " \n\t\r");
 	for (std::vector<std::string>::iterator it = buff.begin(); it != buff.end(); it++)
@@ -365,7 +365,7 @@ void Server::_getHostInBuffer(std::string &buffer, std::string &host, std::strin
 	}
 }
 
-std::string Server::_getRightConfigName(std::string &host)
+std::string server::_getRightconfig_handlerName(std::string &host)
 {
 	std::string	ret;
 	size_t		found = 0;
@@ -377,7 +377,7 @@ std::string Server::_getRightConfigName(std::string &host)
 	ip = host.substr(0, pos);
 	if (pos != std::string::npos)
 		uri = host.substr(host.find_first_of("/"), host.npos);
-	for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
+	for(std::map<std::string, config_handler>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
 	{
 		if (it->first.find(ip) != std::string::npos)
 			found++;
@@ -389,11 +389,11 @@ std::string Server::_getRightConfigName(std::string &host)
 		while (found) // checks locations on each matching server{}
 		{
 			std::stringstream	out;
-			Config				tmp;
+			config_handler				tmp;
 
 			out << found;
 			tmp = this->_config.at(ip + "/" + out.str());
-			for (std::map<std::string, Config>::iterator it = tmp.getLocation().begin(); it != tmp.getLocation().end(); it++)
+			for (std::map<std::string, config_handler>::iterator it = tmp.getLocation().begin(); it != tmp.getLocation().end(); it++)
 			{
 				if (it->first.compare(uri) == 0)
 					return (ip + "/" + out.str());
@@ -405,13 +405,13 @@ std::string Server::_getRightConfigName(std::string &host)
 	{
 		std::string port = ip.substr(ip.find(":") + 1, ip.find("/") - ip.find(":"));
 		ip = ip.substr(0, ip.find(":"));
-		for(std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
+		for(std::map<std::string, config_handler>::iterator it = this->_config.begin(); it != this->_config.end(); it++)
 		{
 			if (it->first.find(port) != it->first.npos)
 			{
-				for (size_t i = 0; i < it->second.getServerNames().size(); i++)
+				for (size_t i = 0; i < it->second.getserverNames().size(); i++)
 				{
-					if (it->second.getServerNames()[i].compare(ip) == 0)
+					if (it->second.getserverNames()[i].compare(ip) == 0)
 						return it->first;
 				}
 			}
@@ -421,7 +421,7 @@ std::string Server::_getRightConfigName(std::string &host)
 	return ip + "/1";
 }
 
-std::vector<std::vector<std::string> >	Server::_getConfOfFile(std::string &conf) 
+std::vector<std::vector<std::string> >	server::_getConfOfFile(std::string &conf) 
 {
 	std::ifstream							file(conf.c_str());
 	std::string								line;
@@ -443,7 +443,7 @@ std::vector<std::vector<std::string> >	Server::_getConfOfFile(std::string &conf)
 	return confFile;
 }
 
-void	Server::_fileToServer(std::string &conf_file)
+void	server::_fileToserver(std::string &conf_file)
 {
 	std::vector<std::vector<std::string> >	confFile;
 
@@ -454,18 +454,18 @@ void	Server::_fileToServer(std::string &conf_file)
 		{
 			std::stringstream	out;
 			std::stringstream	countout;
-			Config				block;
+			config_handler				block;
 			int					count = 1;
 
-			i = block.parseServer(confFile, i);
+			i = block.parseserver(confFile, i);
 			block.checkBlock(false);
 			out << block.getPort();
-			for (std::map<std::string, Config>::iterator it = this->_config.begin(); it != this->_config.end(); it++) {
+			for (std::map<std::string, config_handler>::iterator it = this->_config.begin(); it != this->_config.end(); it++) {
 				if (it->first.find(block.getIpAddress() + ":" + out.str()) != std::string::npos)
 					count++;
 			}
 			countout << count;
-			this->_config.insert(std::pair<std::string, Config>(block.getIpAddress() + ":" + out.str() + "/" + countout.str(), block));
+			this->_config.insert(std::pair<std::string, config_handler>(block.getIpAddress() + ":" + out.str() + "/" + countout.str(), block));
 		}
 		else if (confFile[i][0].compare("#") != 0)
 			throw std::runtime_error("Error: Bad server{} configuration\n");

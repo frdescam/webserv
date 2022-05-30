@@ -1,5 +1,5 @@
-#include "../inc/webserv.hpp"
-#include "./server/Server.hpp"
+#include "webserv.hpp"
+#include "server.hpp"
 
 bool g_end = false;
 
@@ -11,7 +11,7 @@ void sig_handler(int signal_num)
 
 int		main(int argc, char **argv)
 {
-	Server	server;
+	server	server;
 
 	try
 	{

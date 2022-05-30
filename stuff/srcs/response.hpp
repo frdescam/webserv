@@ -1,22 +1,22 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
-# include "./../../inc/webserv.hpp"
+# include "webserv.hpp"
 # include <dirent.h>
 
-class Response
+class response
 {
 	public:
-		Response(void);
-		~Response(void);
-		Response(const Response &other);
-		Response	&operator=(const Response &other);
+		response(void);
+		~response(void);
+		response(const response &other);
+		response	&operator=(const response &other);
 
-		std::string	&getRawResponse(void);
+		std::string	&getRawresponse(void);
 		std::map<int, std::string>	&getErrorPages(void);
 		void	setErrorPages(const std::map<int, std::string> &new_errorPages);
-		void	createCgiGet(const std::string &filename);
-		void	createCgiPost(const std::string &filename, const std::string &upload_path);
+		void	createcgiGet(const std::string &filename);
+		void	createcgiPost(const std::string &filename, const std::string &upload_path);
 		void	createGet(const std::string &filename);
 		void	createContinue(void);
 		void	createRedirection(const std::string &redirection);
@@ -25,7 +25,7 @@ class Response
 		void	error(const std::string &error_code);
 		void	addToLengthSent(size_t block_size);
 		bool	isEverythingSent(void);
-		void	setLengthResponseSizeT(size_t len_of_string);
+		void	setLengthresponseSizeT(size_t len_of_string);
 		size_t	getRemainingLength(void);
 		size_t	getLengthSent(void);
 		void	reset(void);
@@ -45,7 +45,7 @@ class Response
 
 		void			_settingMimes(void);
 		std::string		_getErrorMessage(const std::string &error_code);
-		void			_createCgi(const std::string &filename, const std::string &header);
+		void			_createcgi(const std::string &filename, const std::string &header);
 		std::string 	_getPathToError(const std::string &error_code);
 		void			_binary(const std::string &filename);
 		std::streampos	_lengthOfFile(std::ifstream &f);

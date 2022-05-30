@@ -1,21 +1,21 @@
-#include "Cgi.hpp"
+#include "cgi.hpp"
 
-Cgi::Cgi(void)
+cgi::cgi(void)
 {}
 
-Cgi::~Cgi(void)
+cgi::~cgi(void)
 {}
 
-Cgi::Cgi(std::string &path, bool is_post, std::string &infile, std::map<std::string, std::string> &env_vars):
+cgi::cgi(std::string &path, bool is_post, std::string &infile, std::map<std::string, std::string> &env_vars):
 	_post(is_post), _path_to_cgi(path), _infile(infile), _env_vars(env_vars)
 {}
 
-Cgi::Cgi(const Cgi &other):
+cgi::cgi(const cgi &other):
 	_post(other._post), _path_to_cgi(other._path_to_cgi), _infile(other._infile),
 	_env_vars(other._env_vars)
 {}
 
-Cgi		&Cgi::operator=(const Cgi &other)
+cgi		&cgi::operator=(const cgi &other)
 {
 	if (this != &other)
 	{
@@ -27,7 +27,7 @@ Cgi		&Cgi::operator=(const Cgi &other)
 	return *this;
 }
 
-void	Cgi::execute(void)
+void	cgi::execute(void)
 {
 	pid_t		c_pid;
 	FILE 		*fi, *fo;

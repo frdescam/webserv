@@ -1,8 +1,8 @@
-#include "Client.hpp"
+#include "client.hpp"
 
-Client::Client(void) {}
+client::client(void) {}
 
-Client::~Client(void)
+client::~client(void)
 {
 	if (this->_http_request != NULL)
 	{
@@ -11,19 +11,19 @@ Client::~Client(void)
 	}
 }
 
-Client::Client(Client const &other)
+client::client(client const &other)
 {
 	*this = other;
 }
 
-Client::Client(pollfd fd)
+client::client(pollfd fd)
 {
 	this->_client_fd = fd;
 	this->_request_fd = -1;
 	this->_http_request = 0;
 }
 
-Client	&Client::operator=(Client const &other)
+client	&client::operator=(client const &other)
 {
 	if (this != &other)
 	{
@@ -37,7 +37,7 @@ Client	&Client::operator=(Client const &other)
 	return (*this);
 }
 
-void	Client::addToRequest(std::string &str, int rc, Config &block)
+void	client::addTorequest(std::string &str, int rc, config_handler &block)
 {
 	if (this->_http_request != NULL)
 	{
@@ -47,20 +47,20 @@ void	Client::addToRequest(std::string &str, int rc, Config &block)
 			this->_http_request->addToBody(str, 0, rc);
 	}
 	else
-		this->_http_request = new Request(str, rc, block, this->_id);
+		this->_http_request = new request(str, rc, block, this->_id);
 	this->_request_fd = this->_http_request->getFd();
 	this->_request_poll_fd.fd = this->_request_fd;
 	this->_request_poll_fd.events = 0;
 }
 
-void	Client::addToResponseLength(size_t block_size)
+void	client::addToresponseLength(size_t block_size)
 {
 	this->_http_response.addToLengthSent(block_size);
 }
 
-Request			*Client::getRequestPtr(void) {return this->_http_request;}
-void			Client::setId(int new_id) {this->_id = new_id;}
-int				Client::getRequestFd(void) {return this->_request_fd;}
-struct pollfd	Client::getRequestPollFd(void) {return this->_request_poll_fd;}
-struct pollfd	&Client::getClientPollFd(void) {return this->_client_fd;}
-Response		&Client::getResponse(void) {return this->_http_response;}
+request			*client::getrequestPtr(void) {return this->_http_request;}
+void			client::setId(int new_id) {this->_id = new_id;}
+int				client::getrequestFd(void) {return this->_request_fd;}
+struct pollfd	client::getrequestPollFd(void) {return this->_request_poll_fd;}
+struct pollfd	&client::getclientPollFd(void) {return this->_client_fd;}
+response		&client::getresponse(void) {return this->_http_response;}
