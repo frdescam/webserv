@@ -5,7 +5,10 @@ Client::Client(void) {}
 Client::~Client(void)
 {
 	if (this->_http_request != NULL)
+	{
 		delete this->_http_request;
+		this->_http_request = NULL;
+	}
 }
 
 Client::Client(Client const &other)
@@ -16,12 +19,11 @@ Client::Client(Client const &other)
 Client::Client(pollfd fd)
 {
 	this->_client_fd = fd;
-	this->_f = NULL;
 	this->_request_fd = -1;
 	this->_http_request = 0;
 }
 
-Client & Client::operator=(Client const &other)
+Client	&Client::operator=(Client const &other)
 {
 	if (this != &other)
 	{
@@ -31,12 +33,11 @@ Client & Client::operator=(Client const &other)
 		this->_id = other._id;
 		this->_request_poll_fd = other._request_poll_fd;
 		this->_request_fd = other._request_fd;
-		this->_f = other._f;
 	}
 	return (*this);
 }
 
-void	Client::addToRequest(std::string str, int rc, Config &block)
+void	Client::addToRequest(std::string &str, int rc, Config &block)
 {
 	if (this->_http_request != NULL)
 	{
@@ -59,15 +60,7 @@ void	Client::addToResponseLength(size_t block_size)
 
 Request			*Client::getRequestPtr(void) {return this->_http_request;}
 void			Client::setId(int new_id) {this->_id = new_id;}
-//int				Client::getId(void) {return this->_id;}
 int				Client::getRequestFd(void) {return this->_request_fd;}
 struct pollfd	Client::getRequestPollFd(void) {return this->_request_poll_fd;}
 struct pollfd	&Client::getClientPollFd(void) {return this->_client_fd;}
 Response		&Client::getResponse(void) {return this->_http_response;}
-//void 			Client::setResponse(Response &r) {this->_http_response = r;}
-
-void			Client::resetRequest(void)
-{
-	delete this->_http_request;
-	this->_http_request = NULL;
-}

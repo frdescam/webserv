@@ -17,7 +17,6 @@ class Request
 		Request	&operator=(const Request &other);
 
 		bool	isComplete(void);
-		//bool	hasHeader(void);
 		bool	isPost(void);
 		bool	isChunked(void);
 		bool	sentContinue(void);
@@ -30,9 +29,7 @@ class Request
 
 		Response									executeChunked(void);
 		Response									execute(void);
-		//std::map<std::string,std::string> const	&getEnvVars(void) const;
 		Config										&getConf(void);
-		//void										setSentContinue(bool val);
 		int											getFlag(void);
 
 

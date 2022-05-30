@@ -46,10 +46,10 @@ void	Response::reset(void)
 	this->_length_sent = 0;
 }
 
-std::string		&Response::getRawResponse(void) {return this->_raw_response;}
-bool			Response::isEverythingSent(void) {return this->_sent_all;}
-size_t			Response::getRemainingLength(void) {return this->_length_response - this->_length_sent;}
-size_t			Response::getLengthSent(void) {return this->_length_sent;}
+std::string					&Response::getRawResponse(void) {return this->_raw_response;}
+bool						Response::isEverythingSent(void) {return this->_sent_all;}
+size_t						Response::getRemainingLength(void) {return this->_length_response - this->_length_sent;}
+size_t						Response::getLengthSent(void) {return this->_length_sent;}
 std::map<int, std::string>	&Response::getErrorPages(void) {return this->_errorPages;}
 
 void	Response::addToLengthSent(size_t block_size)
@@ -173,8 +173,7 @@ std::streampos	Response::_lengthOfFile(std::ifstream &f)
 void	Response::createGet(const std::string &filename)
 {
 	this->_filename = filename;
-	// does break bruh
-	if (filename.find(".html") == std::string::npos && filename.find(".txt") == std::string::npos)
+	if ((filename.size() <= 5 || filename.compare(filename.size() - 5, 5, ".html") != 0) && (filename.size() <= 4 || filename.compare(filename.size() - 4, 4, ".txt") != 0))
 	{
 		this->_binary(filename);
 		return ;
@@ -183,7 +182,6 @@ void	Response::createGet(const std::string &filename)
 	std::stringstream	ss;
 	std::string			header("HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Length: ");
 	std::string			str, body;
-
 	if (f)
 	{
 		while (f.good())

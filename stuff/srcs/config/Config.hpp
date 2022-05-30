@@ -3,32 +3,29 @@
 
 # include "./../../inc/webserv.hpp"
 
-class Config {
-
+class Config
+{
 	public:
 		Config(void);
 		~Config(void);
-		Config(Config const & other);
-		Config & operator=(Config const & other);
+		Config(Config const &other);
+		Config & operator=(Config const &other);
 
-		//GET
-		std::string								& getIpAddress(void);
-		int										& getPort(void);
-		std::vector<std::string>				& getServerNames(void);
-		std::map<int, std::string>				& getErrorPages(void);
-		unsigned long long						& getClientMaxBodySize(void);
-		std::string 							& getCgiPass(void);
-		std::vector<std::string>				& getAlowMethods(void);
-		std::map<std::string, Config>			& getLocation(void);
-		std::string								& getRoot(void);
-		std::vector<std::string>				& getIndex(void);
-		bool									& getAutoIndex(void);
-		std::string								& getUploadFolder(void);
-		std::pair<std::string, std::string>		& getRedirection(void);
-
+		std::string								&getIpAddress(void);
+		int										&getPort(void);
+		std::vector<std::string>				&getServerNames(void);
+		std::map<int, std::string>				&getErrorPages(void);
+		unsigned long long						&getClientMaxBodySize(void);
+		std::string 							&getCgiPass(void);
+		std::vector<std::string>				&getAlowMethods(void);
+		std::map<std::string, Config>			&getLocation(void);
+		std::string								&getRoot(void);
+		std::vector<std::string>				&getIndex(void);
+		bool									&getAutoIndex(void);
+		std::string								&getUploadFolder(void);
+		std::pair<std::string, std::string>		&getRedirection(void);
 		int										parseServer(std::vector<std::vector<std::string> > confFile, size_t i);
 		void									checkBlock(bool location);
-		std::string								blockName();
 
 	private:
 		std::string								_ipAddress;
@@ -61,7 +58,7 @@ class Config {
 		void	_setAutoIndex(std::vector<std::string> line);
 		void	_setUploadFolder(std::vector<std::string> line);
 		void	_setRedirection(std::vector<std::string> line);
-		void	_removeLastSlashe(std::string & path);
+		void	_removeLastSlashe(std::string &path);
 };
 
 std::ostream	&operator<<(std::ostream &out, Config &conf);

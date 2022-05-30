@@ -6,17 +6,16 @@ Cgi::Cgi(void)
 Cgi::~Cgi(void)
 {}
 
-Cgi::Cgi(std::string path, bool post, std::string infile, std::map<std::string, std::string> env_vars):
-	_post(post), _path_to_cgi(path), _infile(infile), _env_vars(env_vars)
-{
-}
+Cgi::Cgi(std::string &path, bool is_post, std::string &infile, std::map<std::string, std::string> &env_vars):
+	_post(is_post), _path_to_cgi(path), _infile(infile), _env_vars(env_vars)
+{}
 
-Cgi::Cgi(Cgi const & other):
+Cgi::Cgi(const Cgi &other):
 	_post(other._post), _path_to_cgi(other._path_to_cgi), _infile(other._infile),
 	_env_vars(other._env_vars)
 {}
 
-Cgi & Cgi::operator=(Cgi const &other)
+Cgi		&Cgi::operator=(const Cgi &other)
 {
 	if (this != &other)
 	{
@@ -28,7 +27,6 @@ Cgi & Cgi::operator=(Cgi const &other)
 	return *this;
 }
 
-// TODO erase _path_to_cgi DIS*
 void	Cgi::execute(void)
 {
 	pid_t		c_pid;
@@ -45,7 +43,6 @@ void	Cgi::execute(void)
 		eenv_tab[i] = (char *)s[i].c_str();
 	}
 	eenv_tab[this->_env_vars.size()] = 0;
-	//_path_to_cgi = "/usr/bin/php-cgi";
 	stab[0] = (char *)(this->_path_to_cgi.c_str());
 	stab[1] = (char *)(this->_env_vars["SCRIPT_FILENAME"].c_str());
 	stab[2] = 0;
@@ -54,7 +51,6 @@ void	Cgi::execute(void)
 	{
 		fo = fopen(("cgi_" + this->_infile).c_str(), "a");
 		fdo = fileno(fo);
-		//close(2);
 		if (dup2(fdo, STDOUT_FILENO) == -1)
 			perror("dup2");
 		if (this->_post)

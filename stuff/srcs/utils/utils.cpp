@@ -1,6 +1,6 @@
 # include "./../../inc/webserv.hpp"
 
-std::vector<std::string> mySplit(std::string str, std::string charset)
+std::vector<std::string> mySplit(std::string &str, std::string charset)
 {
 	std::vector<std::string>	ret;
 	std::string::size_type		start;

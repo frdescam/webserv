@@ -84,8 +84,8 @@ Request::Request(std::string &request_str, int rc, Config & block, int id): _blo
 		this->_completed = true;
 }
 
-void	Request::_initEnvMap(void) {
-
+void	Request::_initEnvMap(void)
+{
 	std::string env_var[] = {
 		"REDIRECT_STATUS", "DOCUMENT_ROOT",
 		"SERVER_SOFTWARE", "SERVER_NAME",
@@ -102,12 +102,12 @@ void	Request::_initEnvMap(void) {
 		"UPLOAD_STORE",
 		"0"
 	};
-
 	for (size_t i = 0; env_var[i].compare("0"); i++)
 		this->_env_vars.insert(std::pair<std::string, std::string>(env_var[i], ""));
 }
 
-void	Request::_initPostRequest(const std::string &request_str, int rc, int id) {
+void	Request::_initPostRequest(const std::string &request_str, int rc, int id)
+{
 	std::stringstream	ss;
 
 	ss << id;
@@ -125,11 +125,8 @@ void	Request::_initPostRequest(const std::string &request_str, int rc, int id) {
 bool										Request::isComplete(void) { return this->_completed; }
 bool										Request::isChunked(void) { return this->_chunked; }
 bool										Request::isPost(void) { return this->_post; }
-//bool										Request::hasHeader(void) { return this->_header_completed; }
 bool										Request::sentContinue(void) { return this->_sent_continue; }
-//std::map<std::string,std::string> const & 	Request::getEnvVars(void) const { return this->_env_vars; }
-Config &									Request::getConf(void) { return this->_block; }
-//void										Request::setSentContinue(bool val) { this->_sent_continue = val;}
+Config										&Request::getConf(void) { return this->_block; }
 int											Request::getFd(void) { return this->_fd; }
 int											Request::getFlag(void) { return this->_flag; }
 FILE								*		Request::getFp(void) { return this->_fp; }
@@ -158,7 +155,6 @@ Response	Request::execute(void)
 		r.error(ss.str());
 		return (r);
 	}
-	//std::cout << this->_env_vars["SCRIPT_NAME"] << "\n";
 	if (this->_env_vars["SERVER_PROTOCOL"].compare("HTTP/1.1"))
 		r.error("505");
 	else if (this->_env_vars["REQUEST_URI"].find(".php") != std::string::npos
@@ -170,7 +166,6 @@ Response	Request::execute(void)
 			r.error("411");
 			return (r);
 		}
-		//std::cout << this->_env_vars["SCRIPT_FILENAME"] << "\n";
 		this->_cgi = true;
 		if (pathIsFile(this->_env_vars["SCRIPT_FILENAME"]) == 1)
 		{
@@ -199,12 +194,11 @@ Response	Request::execute(void)
 	return (r);
 }
 
-// TODO check if delete works
 Response	Request::_executeDelete(Response &r)
 {
-    std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
+	std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
-    int			res;
+	int			res;
 
 	if (!this->_block.getAlowMethods().empty() && std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "DELETE") == this->_block.getAlowMethods().end())
 	{
@@ -214,7 +208,6 @@ Response	Request::_executeDelete(Response &r)
 	if (path[path.size() - 1] == '/')
 		path.erase(path.size() - 1);
 	ret_check_path = check_path(path);
-	//std::cout << ret_check_path << "\n";
 	if (ret_check_path == -1)
 		r.error("404");
 	else if (ret_check_path == 4)
@@ -236,7 +229,6 @@ Response	Request::_executeDelete(Response &r)
 	}
 	else
 	{
-		//res = remove(path.c_str());
 		if (check_wright_rights(path))
 		{
 			res = remove(path.c_str());
@@ -255,7 +247,6 @@ Response	Request::_executeGet(Response &r)
 	std::string	path = this->_env_vars["DOCUMENT_ROOT"] + this->_env_vars["REQUEST_URI"];
 	int			ret_check_path;
 
-	//std::cout << path << "\n";
 	if (!this->_block.getAlowMethods().empty() && std::find(this->_block.getAlowMethods().begin(), this->_block.getAlowMethods().end(), "GET") == this->_block.getAlowMethods().end()) {
 		r.error("405");
 		return r;
@@ -302,7 +293,6 @@ Response	Request::_executeRedirection(Response &r)
 
 void	Request::addToBody(const std::string &request_str, int pos, int len)
 {
-	//std::cout << pos << " " << len << " " << "\n";
 	this->_body_part.append(request_str, pos, len); 
 	this->_body_part_len += len;
 }

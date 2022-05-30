@@ -6,31 +6,27 @@ RM		=	rm -f
 
 CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 
-SRCS	=	src/webserv.cpp \
-			src/config/Config.cpp \
-			src/server/Server.cpp \
-			src/request/Request.cpp \
-			src/response/Response.cpp \
-			src/client/Client.cpp \
-			src/utils/utils.cpp \
-			src/cgi/Cgi.cpp \
-			src/request/Parser.cpp
+SRCS	=	srcs/webserv.cpp \
+			srcs/config/Config.cpp \
+			srcs/server/Server.cpp \
+			srcs/request/Request.cpp \
+			srcs/response/Response.cpp \
+			srcs/client/Client.cpp \
+			srcs/utils/utils.cpp \
+			srcs/cgi/Cgi.cpp \
+			srcs/request/Parser.cpp
 
 
 INCLUDES	=	inc/webserv.hpp \
-				src/config/Config.hpp \
-				src/server/Server.hpp \
-				src/request/Request.hpp \
-				src/response/Response.hpp \
-				src/client/Client.hpp \
-				src/cgi/Cgi.hpp \
-				src/request/Parser.hpp
+				srcs/config/Config.hpp \
+				srcs/server/Server.hpp \
+				srcs/request/Request.hpp \
+				srcs/response/Response.hpp \
+				srcs/client/Client.hpp \
+				srcs/cgi/Cgi.hpp \
+				srcs/request/Parser.hpp
 
 OBJS	=	${SRCS:.cpp=.o}
-
-.PHONY: clean fclean re
-
-all: ${NAME}
 
 ${NAME}: ${OBJS} $(INCLUDES)
 	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
@@ -38,13 +34,17 @@ ${NAME}: ${OBJS} $(INCLUDES)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -o $@ -c $<
 
+all: ${NAME}
+
 clean:
 	$(RM) ${OBJS}
 
 fclean: clean
 	$(RM) ${NAME}
 
+re: fclean all
+
 test: all
 	./${NAME}
 
-re: fclean all
+.PHONY: all clean fclean re test

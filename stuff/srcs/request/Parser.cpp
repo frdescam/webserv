@@ -50,11 +50,13 @@ std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output
 	size_t i = 0;
 
 	this->_length_header = output.find("\r\n\r\n");
-	if (this->_length_header != std::string::npos) {
+	if (this->_length_header != std::string::npos)
+	{
 		this->_header = output.substr(0, output.find("\r\n\r\n"));
 		this->_length_header += 4;
 	}
-	else {
+	else
+	{
 		this->_header = output;
 		this->_length_header = this->_header.size();
 	}
@@ -91,12 +93,6 @@ std::map<std::string, std::string>	Parser::parseOutputClient(std::string &output
 	return this->_env_vars;
 }
 
-/*
-** The QUERY_STRING variable contains a URL-encoded search or parameter
-** string; it provides information to the CGI script to affect or refine
-** the document to be returned by the script.
-*/
-
 void	Parser::_parseQueryString(std::string &request_uri)
 {
 	std::size_t	i = 0;
@@ -107,10 +103,6 @@ void	Parser::_parseQueryString(std::string &request_uri)
 			this->_env_vars["QUERY_STRING"] = request_uri.substr(i + 1, request_uri.length() - (i + 1));
 	}
 }
-
-/*
-** The REQUEST_METHOD meta-variable MUST be set to the method which should be used by the script to process the request
-*/
 
 void	Parser::_parseRequestMethod(std::string &output, std::size_t &pos)
 {
@@ -166,11 +158,6 @@ void	Parser::_parseScript(std::string &request_uri)
 		this->_env_vars["SCRIPT_NAME"] = "";
 }
 
-/*
-** The SERVER_PROTOCOL variable MUST be set to the name and version of
-** the application protocol used for this CGI request.
-*/
-
 void	Parser::_parseServerProtocol(std::string &output, std::size_t &pos)
 {
 	std::size_t	i = 0, length_protocol = 0;
@@ -191,11 +178,6 @@ void	Parser::_parseServerProtocol(std::string &output, std::size_t &pos)
 	if (this->_env_vars["SERVER_PROTOCOL"].empty())
 		this->_flag = 505;
 }
-
-/*
-** The SERVER_PORT variable MUST be set to the TCP/IP port number on
-** which this request is received from the client.
-*/
 
 void	Parser::_parseServerPort(std::string &output, std::size_t &pos)
 {

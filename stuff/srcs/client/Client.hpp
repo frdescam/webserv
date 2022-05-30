@@ -16,11 +16,9 @@ class Client
 		Client	&operator=(Client const &other);
 
 		Response		&getResponse(void);
-		//void 			setResponse(Response &r);
-		void			addToRequest(std::string str, int rc, Config &block);
+		void			addToRequest(std::string &str, int rc, Config &block);
 		void			addToResponseLength(size_t block_size);
 		void			setId(int new_id);
-		//int			getId(void);
 		int				getRequestFd(void);
 		struct pollfd	getRequestPollFd(void);
 		struct pollfd	&getClientPollFd(void);
@@ -34,7 +32,6 @@ class Client
 		int				_id;
 		struct pollfd	_request_poll_fd;
 		int				_request_fd;
-		FILE			*_f;
 };
 
 #endif

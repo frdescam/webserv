@@ -6,7 +6,6 @@
 
 class Response
 {
-
 	public:
 		Response(void);
 		~Response(void);

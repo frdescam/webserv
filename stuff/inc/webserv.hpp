@@ -32,8 +32,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define TRUE					1
-#define FALSE					0
 #define DEFAULT_CONFIG			"data/conf/example.conf"
 #define DEFAULT_INDEX			"data/webserv_default_index.html"
 #define DEFAULT_ERRORS_PATH		"data/error_pages/"
@@ -43,7 +41,7 @@
 
 	extern bool	g_end;
 
-	std::vector<std::string>	mySplit(std::string s, std::string charset);
+	std::vector<std::string>	mySplit(std::string &s, std::string charset);
 	int							pathIsFile(const std::string &path);
 	int							check_path(const std::string &path);
 	int							check_read_rights(const std::string &path);
